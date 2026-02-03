@@ -1,0 +1,137 @@
+# Reusable workflow: Release Version
+#
+# Mirrors the behavior of `.github/existing-workflows/release-version.yml` but generalized:
+# - Generate changelog + bump version via conventional commits
+# - Create a GitHub release
+# - Optionally sync the release branch into another branch (e.g., main → dev)
+# - Optional Slack notifications
+#
+# Note: triggers (push to main, paths-ignore, etc.) belong in the calling repo.
+# Usage:
+#   jobs:
+#     release:
+#       uses: maker-tech/ci-client-workflows/.github/workflows/release-version.yml@v1
+#       with:
+#         release_branch: main
+#         sync_branch: dev
+#       secrets:
+#         ADMIN_GITHUB_TOKEN: ${{ secrets.SOME_ADMIN_TOKEN }}
+#         SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+#
+
+name: Release Version
+
+on:
+  workflow_call:
+    inputs:
+      release_branch:
+        description: 'Branch where releases are created'
+        type: string
+        default: 'main'
+      sync_branch:
+        description: 'Branch to sync from release_branch after release (set blank to disable)'
+        type: string
+        default: 'dev'
+      preset:
+        description: 'conventional-changelog preset'
+        type: string
+        default: 'conventionalcommits'
+      output_file:
+        description: 'Changelog output file'
+        type: string
+        default: 'CHANGELOG.md'
+      skip_on_empty:
+        description: 'Skip release if no commits match (false = always create releases)'
+        type: boolean
+        default: false
+    secrets:
+      ADMIN_GITHUB_TOKEN:
+        description: 'Admin token for protected branches and creating releases'
+        required: true
+      SLACK_WEBHOOK:
+        description: 'Slack webhook for notifications (optional)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ensure correct branch
+        if: ${{ github.ref_name != inputs.release_branch }}
+        shell: bash
+        run: |
+          echo "This workflow is intended to run from '${{ inputs.release_branch }}' (current: '${{ github.ref_name }}')."
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@84dadaf2c367cb52af02737cd9c7e888807219e7
+        with:
+          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          preset: ${{ inputs.preset }}
+          output-file: ${{ inputs.output_file }}
+          skip-on-empty: ${{ inputs.skip_on_empty }}
+
+      - name: Release
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        with:
+          tag_name: ${{ steps.changelog.outputs.tag }}
+          name: Release ${{ steps.changelog.outputs.tag }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+
+      - name: Merge ${{ inputs.release_branch }} into ${{ inputs.sync_branch }} (always create merge commit)
+        id: merge_to_sync
+        if: ${{ steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin
+          git checkout "${{ inputs.sync_branch }}"
+          git pull origin "${{ inputs.sync_branch }}"
+
+          git merge --no-ff "origin/${{ inputs.release_branch }}" -m "chore: merge ${{ inputs.release_branch }} into ${{ inputs.sync_branch }} after release ${{ steps.changelog.outputs.tag }}"
+          git push origin "${{ inputs.sync_branch }}"
+        continue-on-error: true
+
+      - name: Send Slack notification of release version on success
+        if: ${{ steps.changelog.outputs.skipped == 'false' && secrets.SLACK_WEBHOOK != '' && (inputs.sync_branch == '' || steps.merge_to_sync.outcome == 'success') }}
+        uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
+        env:
+          SLACK_COLOR: 'good'
+          SLACK_ICON_EMOJI: ':fish:'
+          SLACK_MESSAGE: ${{ steps.changelog.outputs.clean_changelog }}
+          SLACK_TITLE: 'Release Version & Changelog'
+          SLACK_USERNAME: Github
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Send Slack notification of merge failure
+        if: ${{ steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' && secrets.SLACK_WEBHOOK != '' && steps.merge_to_sync.outcome == 'failure' }}
+        uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
+        env:
+          SLACK_COLOR: 'warning'
+          SLACK_ICON_EMOJI: ':warning:'
+          SLACK_MESSAGE: 'Release ${{ steps.changelog.outputs.tag }} succeeded, but failed to merge into ${{ inputs.sync_branch }}. Please merge manually.'
+          SLACK_TITLE: 'Manual Merge Required'
+          SLACK_USERNAME: Github
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+    outputs:
+      tag:
+        description: 'Release tag that was created'
+        value: ${{ steps.changelog.outputs.tag }}

@@ -1,0 +1,64 @@
+# Internal workflow: Release this repository
+#
+# This workflow is NOT intended for external use. It releases the ci-client-workflows
+# repository itself using the shared release-version.yml workflow.
+#
+# Key differences from consumer repos:
+# - No dev branch to sync (sync_branch is empty)
+# - Updates major version tags (v1, v2) for GitHub Actions compatibility
+#
+# Naming convention: Workflows prefixed with underscore (_) are internal to this
+# repository and should not be referenced by other repositories.
+
+name: '[Internal] Release'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Create Release
+    uses: ./.github/workflows/release-version.yml
+    with:
+      release_branch: main
+      sync_branch: '' # No dev branch in this repo
+      skip_on_empty: true
+    secrets:
+      ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+
+  update-major-tag:
+    name: Update Major Version Tag
+    needs: release
+    if: needs.release.outputs.tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Update major version tag
+        env:
+          TAG: ${{ needs.release.outputs.tag }}
+        run: |
+          # Extract major version (e.g., v1 from v1.2.3)
+          MAJOR=$(echo "$TAG" | grep -oE '^v[0-9]+')
+
+          if [ -z "$MAJOR" ]; then
+            echo "Could not extract major version from tag: $TAG"
+            exit 1
+          fi
+
+          echo "Updating $MAJOR to point to $TAG"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Force update the major version tag
+          git tag -fa "$MAJOR" -m "Update $MAJOR to $TAG"
+          git push origin "$MAJOR" --force

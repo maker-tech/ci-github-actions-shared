@@ -1,0 +1,86 @@
+# Reusable workflow: Promote one branch into another (always merge commit)
+#
+# Note: triggers (workflow_dispatch, etc.) belong in the calling repo.
+# Usage:
+#   jobs:
+#     promote:
+#       uses: maker-tech/ci-client-workflows/.github/workflows/promote-branch.yml@v1
+#       with:
+#         source_branch: dev
+#         target_branch: uat
+#       secrets:
+#         ADMIN_GITHUB_TOKEN: ${{ secrets.SOME_ADMIN_TOKEN }}
+#         SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+#
+
+name: Promote Branch
+
+on:
+  workflow_call:
+    inputs:
+      source_branch:
+        description: 'Branch to merge from'
+        type: string
+        required: true
+      target_branch:
+        description: 'Branch to merge into'
+        type: string
+        required: true
+      merge_message:
+        description: 'Merge commit message (leave blank for default)'
+        type: string
+        default: ''
+    secrets:
+      ADMIN_GITHUB_TOKEN:
+        description: 'Admin token to push to protected branches'
+        required: true
+      SLACK_WEBHOOK:
+        description: 'Slack webhook for failure notifications (optional)'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          fetch-depth: 0
+          ref: ${{ inputs.target_branch }}
+
+      - name: Merge ${{ inputs.source_branch }} into ${{ inputs.target_branch }} (always create merge commit)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin
+          git checkout "${{ inputs.target_branch }}"
+          git pull origin "${{ inputs.target_branch }}"
+
+          if [[ -n "${{ inputs.merge_message }}" ]]; then
+            MSG="${{ inputs.merge_message }}"
+          else
+            MSG="chore: promote ${{ inputs.source_branch }} to ${{ inputs.target_branch }}"
+          fi
+
+          git merge --no-ff "origin/${{ inputs.source_branch }}" -m "$MSG"
+          git push origin "${{ inputs.target_branch }}"
+
+      - name: Send Slack notification on failure
+        if: ${{ failure() && secrets.SLACK_WEBHOOK != '' }}
+        uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON_EMOJI: ':eyes:'
+          SLACK_MESSAGE: 'Promotion from ${{ inputs.source_branch }} to ${{ inputs.target_branch }} has exited with status: ${{ job.status }}'
+          SLACK_TITLE: 'Status:'
+          SLACK_USERNAME: Github
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
