@@ -4,7 +4,7 @@
 # Usage:
 #   jobs:
 #     promote:
-#       uses: maker-tech/ci-client-workflows/.github/workflows/promote-branch.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
 #       with:
 #         source_branch: dev
 #         target_branch: uat

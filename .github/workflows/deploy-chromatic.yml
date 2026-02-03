@@ -4,7 +4,7 @@
 # Usage:
 #   jobs:
 #     chromatic:
-#       uses: maker-tech/ci-client-workflows/.github/workflows/deploy-chromatic.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
 #       with:
 #         package_manager: pnpm
 #         pnpm_version: 10.28.2
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Determine ci-client-workflows ref
+      - name: Determine ci-github-actions-shared ref
         id: ci_ref
         shell: bash
         run: |
@@ -77,16 +77,16 @@ jobs:
           path: app
           fetch-depth: ${{ inputs.fetch_depth }}
 
-      - name: Checkout ci-client-workflows repo (for local composite actions)
+      - name: Checkout ci-github-actions-shared repo (for local composite actions)
         uses: actions/checkout@v4
         with:
-          repository: maker-tech/ci-client-workflows
+          repository: maker-tech/ci-github-actions-shared
           ref: ${{ steps.ci_ref.outputs.ref }}
-          path: ci-client-workflows
+          path: ci-github-actions-shared
           token: ${{ github.token }}
 
       - name: Setup Node.js + install deps
-        uses: ./ci-client-workflows/actions/setup-node
+        uses: ./ci-github-actions-shared/actions/setup-node
         with:
           package_manager: ${{ inputs.package_manager }}
           pnpm_version: ${{ inputs.pnpm_version }}

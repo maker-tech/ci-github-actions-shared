@@ -1,0 +1,102 @@
+# Composite Action: Docker Build & Push
+# Build and push Docker images to a registry
+#
+# Usage:
+#   - uses: your-org/ci-github-actions-shared/actions/docker-build-push@v1
+#     with:
+#       image_name: europe-docker.pkg.dev/project/repo/app
+#       tags: latest,${{ github.sha }}
+
+name: Docker Build & Push
+description: 'Build and push Docker images with buildx'
+
+inputs:
+  image_name:
+    description: 'Full image name without tag'
+    required: true
+  tags:
+    description: 'Comma-separated list of tags'
+    required: false
+    default: 'latest'
+  context:
+    description: 'Docker build context'
+    required: false
+    default: '.'
+  dockerfile:
+    description: 'Path to Dockerfile'
+    required: false
+    default: 'Dockerfile'
+  push:
+    description: 'Push the image after building'
+    required: false
+    default: 'true'
+  build_args:
+    description: 'Build arguments (newline-separated KEY=VALUE)'
+    required: false
+    default: ''
+  platforms:
+    description: 'Target platforms for build'
+    required: false
+    default: 'linux/amd64'
+
+outputs:
+  image:
+    description: 'Full image name with first tag'
+    value: ${{ steps.build.outputs.image }}
+  digest:
+    description: 'Image digest'
+    value: ${{ steps.build.outputs.digest }}
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Parse tags
+      id: tags
+      shell: bash
+      run: |
+        IMAGE="${{ inputs.image_name }}"
+        TAGS="${{ inputs.tags }}"
+
+        # Convert comma-separated tags to newline-separated full image:tag
+        FULL_TAGS=""
+        IFS=',' read -ra TAG_ARRAY <<< "$TAGS"
+        for tag in "${TAG_ARRAY[@]}"; do
+          tag=$(echo "$tag" | xargs)  # trim whitespace
+          if [ -n "$FULL_TAGS" ]; then
+            FULL_TAGS="$FULL_TAGS
+        $IMAGE:$tag"
+          else
+            FULL_TAGS="$IMAGE:$tag"
+          fi
+        done
+
+        # Output for docker/build-push-action
+        echo "tags<<EOF" >> $GITHUB_OUTPUT
+        echo "$FULL_TAGS" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
+        # First tag for output
+        FIRST_TAG=$(echo "${TAG_ARRAY[0]}" | xargs)
+        echo "first_tag=$IMAGE:$FIRST_TAG" >> $GITHUB_OUTPUT
+
+    - name: Build and push
+      id: build
+      uses: docker/build-push-action@v5
+      with:
+        context: ${{ inputs.context }}
+        file: ${{ inputs.dockerfile }}
+        push: ${{ inputs.push }}
+        tags: ${{ steps.tags.outputs.tags }}
+        platforms: ${{ inputs.platforms }}
+        build-args: ${{ inputs.build_args }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Set outputs
+      shell: bash
+      run: |
+        echo "image=${{ steps.tags.outputs.first_tag }}" >> $GITHUB_OUTPUT
+        echo "digest=${{ steps.build.outputs.digest }}" >> $GITHUB_OUTPUT

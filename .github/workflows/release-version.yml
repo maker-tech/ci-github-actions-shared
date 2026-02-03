@@ -10,7 +10,7 @@
 # Usage:
 #   jobs:
 #     release:
-#       uses: maker-tech/ci-client-workflows/.github/workflows/release-version.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
 #       with:
 #         release_branch: main
 #         sync_branch: dev

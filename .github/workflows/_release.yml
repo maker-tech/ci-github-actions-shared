@@ -1,6 +1,6 @@
 # Internal workflow: Release this repository
 #
-# This workflow is NOT intended for external use. It releases the ci-client-workflows
+# This workflow is NOT intended for external use. It releases the ci-github-actions-shared
 # repository itself using the shared release-version.yml workflow.
 #
 # Key differences from consumer repos:

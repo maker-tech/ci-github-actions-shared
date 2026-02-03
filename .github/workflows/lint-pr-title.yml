@@ -7,7 +7,7 @@
 #       types: [opened, edited, synchronize, reopened]
 #   jobs:
 #     lint:
-#       uses: maker-tech/ci-client-workflows/.github/workflows/lint-pr-title.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
 #
 
 name: Lint PR title
