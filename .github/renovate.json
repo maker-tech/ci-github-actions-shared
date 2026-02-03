@@ -1,0 +1,70 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"description": "Renovate config for ci-github-actions-shared (GitHub Actions only)",
+	"extends": ["config:recommended", ":ignoreUnstable"],
+	"timezone": "Pacific/Auckland",
+	"schedule": ["before 6am on monday"],
+	"prConcurrentLimit": 5,
+	"labels": ["dependencies", "automated"],
+	"commitMessagePrefix": "chore(ci):",
+	"vulnerabilityAlerts": {
+		"enabled": true,
+		"labels": ["security", "dependencies"],
+		"minimumReleaseAge": null
+	},
+	"minimumReleaseAge": "7 days",
+	"prCreation": "not-pending",
+	"packageRules": [
+		{
+			"description": "Vulnerability alerts - highest priority",
+			"matchCategories": ["security"],
+			"labels": ["security", "dependencies"],
+			"minimumReleaseAge": null,
+			"prPriority": 100
+		},
+		{
+			"description": "GitHub Actions - core actions (high trust, auto-merge)",
+			"matchManagers": ["github-actions"],
+			"matchPackageNames": [
+				"actions/checkout",
+				"actions/setup-node",
+				"actions/cache",
+				"actions/upload-artifact",
+				"actions/download-artifact",
+				"actions/github-script"
+			],
+			"groupName": "github-actions-core",
+			"labels": ["dependencies", "github-actions"],
+			"minimumReleaseAge": "7 days",
+			"prPriority": 20,
+			"automerge": true,
+			"automergeType": "pr",
+			"matchUpdateTypes": ["minor", "patch", "digest"]
+		},
+		{
+			"description": "GitHub Actions - pnpm setup",
+			"matchManagers": ["github-actions"],
+			"matchPackageNames": ["pnpm/action-setup"],
+			"labels": ["dependencies", "github-actions"],
+			"minimumReleaseAge": "7 days",
+			"prPriority": 18
+		},
+		{
+			"description": "GitHub Actions - other third-party actions",
+			"matchManagers": ["github-actions"],
+			"matchPackageNames": [
+				"!actions/checkout",
+				"!actions/setup-node",
+				"!actions/cache",
+				"!actions/upload-artifact",
+				"!actions/download-artifact",
+				"!actions/github-script",
+				"!pnpm/action-setup"
+			],
+			"groupName": "github-actions-third-party",
+			"labels": ["dependencies", "github-actions"],
+			"minimumReleaseAge": "14 days",
+			"prPriority": 15
+		}
+	]
+}

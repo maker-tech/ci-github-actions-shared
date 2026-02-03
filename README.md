@@ -327,6 +327,50 @@ uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
 uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1.2.3
 ```
 
+### Automated Updates with Renovate
+
+This repo provides a **shareable Renovate preset** for consumer repositories. Use it to automatically track shared workflow updates and manage npm dependencies with sensible defaults.
+
+**Minimal consumer `renovate.json`:**
+
+```json
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		"github>maker-tech/ci-github-actions-shared"
+	],
+	"timezone": "Pacific/Auckland",
+	"schedule": ["before 6am on monday"]
+}
+```
+
+That's it. The preset handles everything else.
+
+**What the preset includes:**
+
+| Category                | Behaviour                                                    |
+| ----------------------- | ------------------------------------------------------------ |
+| Shared workflow refs    | Auto-detect `ci-github-actions-shared/...@vX` and create PRs |
+| Major version updates   | Flagged as breaking with review checklist                    |
+| Dev dependencies        | Grouped, 14-day stability period                             |
+| Production dependencies | Grouped (non-critical), 14-day stability                     |
+| Critical packages       | Individual PRs (next, react, typescript, etc.)               |
+| Node.js version         | Notes to align with shared workflow defaults                 |
+
+**Critical packages** (get individual PRs):
+
+`next`, `react`, `react-dom`, `next-auth`, `tailwindcss`, `typescript`, `zod`, `@tanstack/react-query`, `@sentry/*`, `@builder.io/*`
+
+**Why inheritance over scaffolding?**
+
+| Scaffolding (copy-paste)      | Inheritance (this approach)         |
+| ----------------------------- | ----------------------------------- |
+| Workflows copied to each repo | Thin wrappers call shared workflows |
+| Updates require manual sync   | Updates via Renovate PRs            |
+| Drift between repositories    | Consistent behaviour everywhere     |
+| Template bloat                | Single source of truth              |
+
 ## What These Workflows Will NOT Do
 
 The shared workflows will not:

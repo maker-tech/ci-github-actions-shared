@@ -1,0 +1,124 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"description": "Shareable Renovate preset for repos inheriting ci-github-actions-shared workflows. Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared\"]",
+	"customManagers": [
+		{
+			"customType": "regex",
+			"description": "Track maker-tech/ci-github-actions-shared reusable workflow references",
+			"fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+			"matchStrings": [
+				"uses:\\s*['\"]?maker-tech/ci-github-actions-shared/\\.github/workflows/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
+			],
+			"datasourceTemplate": "github-releases",
+			"depNameTemplate": "maker-tech/ci-github-actions-shared",
+			"versioningTemplate": "semver"
+		},
+		{
+			"customType": "regex",
+			"description": "Track maker-tech/ci-github-actions-shared composite action references",
+			"fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+			"matchStrings": [
+				"uses:\\s*['\"]?maker-tech/ci-github-actions-shared/actions/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
+			],
+			"datasourceTemplate": "github-releases",
+			"depNameTemplate": "maker-tech/ci-github-actions-shared",
+			"versioningTemplate": "semver"
+		}
+	],
+	"packageRules": [
+		{
+			"description": "Shared CI workflows - inheritance pattern updates",
+			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
+			"groupName": "shared-ci-workflows",
+			"labels": ["dependencies", "ci-inheritance"],
+			"commitMessagePrefix": "chore(ci):",
+			"minimumReleaseAge": "3 days",
+			"prPriority": 25,
+			"semanticCommitScope": "ci",
+			"prBodyNotes": [
+				"Updates inherited CI workflows from `ci-github-actions-shared`.",
+				"",
+				"**Review checklist:**",
+				"- [ ] Check [CHANGELOG](https://github.com/maker-tech/ci-github-actions-shared/blob/main/CHANGELOG.md)",
+				"- [ ] Verify workflow inputs haven't changed",
+				"",
+				"**Inheritance strategy**: Inherit, don't scaffold."
+			]
+		},
+		{
+			"description": "Shared CI workflows - major version updates (breaking)",
+			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
+			"matchUpdateTypes": ["major"],
+			"labels": ["dependencies", "ci-inheritance", "breaking-change"],
+			"prPriority": 30,
+			"prBodyNotes": [
+				"**BREAKING CHANGE**: Major version update to shared CI workflows.",
+				"",
+				"**Before merging:**",
+				"1. Review migration guide in CHANGELOG.md",
+				"2. Check if workflow inputs have changed",
+				"3. Verify secrets requirements haven't changed"
+			]
+		},
+		{
+			"description": "Development dependencies - minor/patch grouped",
+			"matchDepTypes": ["devDependencies"],
+			"matchUpdateTypes": ["minor", "patch"],
+			"groupName": "dev-dependencies",
+			"labels": ["dependencies", "dev-deps"],
+			"minimumReleaseAge": "14 days",
+			"prPriority": 5
+		},
+		{
+			"description": "Production dependencies - minor/patch grouped (non-critical)",
+			"matchDepTypes": ["dependencies"],
+			"matchUpdateTypes": ["minor", "patch"],
+			"groupName": "production-minor-patch",
+			"labels": ["dependencies", "prod-deps"],
+			"minimumReleaseAge": "14 days",
+			"prPriority": 10,
+			"matchPackageNames": [
+				"!next",
+				"!react",
+				"!react-dom",
+				"!next-auth",
+				"!tailwindcss",
+				"!typescript",
+				"!zod",
+				"!@tanstack/react-query",
+				"!/^@sentry//",
+				"!/^@builder\\.io//"
+			]
+		},
+		{
+			"description": "Critical packages - individual PRs with stability period",
+			"labels": ["dependencies", "prod-deps", "critical"],
+			"minimumReleaseAge": "14 days",
+			"prPriority": 15,
+			"matchPackageNames": [
+				"next",
+				"react",
+				"react-dom",
+				"next-auth",
+				"tailwindcss",
+				"typescript",
+				"zod",
+				"@tanstack/react-query",
+				"/^@sentry//",
+				"/^@builder\\.io//"
+			]
+		},
+		{
+			"description": "Node.js version - coordinate with shared workflow defaults",
+			"matchManagers": ["nvm", "nodenv"],
+			"matchPackageNames": ["node"],
+			"labels": ["dependencies", "nodejs"],
+			"minimumReleaseAge": "14 days",
+			"prPriority": 18,
+			"prBodyNotes": [
+				"Ensure Node.js version aligns with `ci-github-actions-shared` defaults.",
+				"Current shared workflow default: `22.12.0`"
+			]
+		}
+	]
+}
