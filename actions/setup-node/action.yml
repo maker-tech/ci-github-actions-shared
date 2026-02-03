@@ -1,0 +1,64 @@
+# Composite Action: Setup Node.js
+# Standardized Node.js setup with caching
+#
+# Usage:
+#   - uses: maker-tech/ci-github-actions-shared/actions/setup-node@v1
+#     with:
+#       package_manager: pnpm
+#       pnpm_version: 10.28.2
+#       node_version: 22.12.0
+
+name: Setup Node.js
+description: 'Setup Node.js with package-manager aware caching'
+
+inputs:
+  package_manager:
+    description: 'Package manager to use (pnpm or npm)'
+    required: false
+    default: 'pnpm'
+  pnpm_version:
+    description: 'pnpm version to install when package_manager=pnpm'
+    required: false
+    default: '10.28.2'
+  node_version:
+    description: 'Node.js version to install'
+    required: false
+    default: '22.12.0'
+  working_directory:
+    description: 'Working directory containing lockfile'
+    required: false
+    default: '.'
+  install_dependencies:
+    description: 'Whether to install dependencies after setup'
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      if: inputs.package_manager == 'pnpm'
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm_version }}
+
+    - name: Setup Node.js ${{ inputs.node_version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node_version }}
+        cache: ${{ inputs.package_manager }}
+        cache-dependency-path: |
+          ${{ inputs.working_directory }}/pnpm-lock.yaml
+          ${{ inputs.working_directory }}/package-lock.json
+
+    - name: Install dependencies
+      if: inputs.install_dependencies == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working_directory }}
+      run: |
+        set -euo pipefail
+        if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
+          pnpm install --frozen-lockfile
+        else
+          npm ci
+        fi

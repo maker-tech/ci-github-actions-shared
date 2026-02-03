@@ -1,0 +1,127 @@
+# Reusable workflow: Deploy Chromatic
+#
+# Note: triggers (push to uat, paths-ignore, etc.) belong in the calling repo.
+# Usage:
+#   jobs:
+#     chromatic:
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
+#       with:
+#         package_manager: pnpm
+#         pnpm_version: 10.28.2
+#         working_directory: .
+#         # Optional: pass extra environment variables as KEY=VALUE lines
+#         extra_env: |
+#           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+#       secrets:
+#         CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+#
+
+name: Deploy Chromatic
+
+on:
+  workflow_call:
+    inputs:
+      package_manager:
+        description: 'Package manager to use (pnpm or npm)'
+        type: string
+        default: 'pnpm'
+      pnpm_version:
+        description: 'pnpm version (when package_manager=pnpm)'
+        type: string
+        default: '10.28.2'
+      node_version:
+        description: 'Node.js version to use'
+        type: string
+        default: '22.12.0'
+      working_directory:
+        description: 'Directory containing the app'
+        type: string
+        default: '.'
+      fetch_depth:
+        description: 'Git fetch depth (0 for full history)'
+        type: number
+        default: 0
+      chromatic_command:
+        description: 'Command to run Chromatic (leave blank to use defaults)'
+        type: string
+        default: ''
+      extra_env:
+        description: 'Extra environment variables as newline-separated KEY=VALUE pairs'
+        type: string
+        default: ''
+    secrets:
+      CHROMATIC_PROJECT_TOKEN:
+        description: 'Chromatic project token'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  chromatic:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine ci-github-actions-shared ref
+        id: ci_ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          wf_ref='${{ github.workflow_ref }}'
+          ref="${wf_ref##*@}"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+        with:
+          path: app
+          fetch-depth: ${{ inputs.fetch_depth }}
+
+      - name: Checkout ci-github-actions-shared repo (for local composite actions)
+        uses: actions/checkout@v4
+        with:
+          repository: maker-tech/ci-github-actions-shared
+          ref: ${{ steps.ci_ref.outputs.ref }}
+          path: ci-github-actions-shared
+          token: ${{ github.token }}
+
+      - name: Setup Node.js + install deps
+        uses: ./ci-github-actions-shared/actions/setup-node
+        with:
+          package_manager: ${{ inputs.package_manager }}
+          pnpm_version: ${{ inputs.pnpm_version }}
+          node_version: ${{ inputs.node_version }}
+          working_directory: app/${{ inputs.working_directory }}
+          install_dependencies: 'true'
+
+      - name: Run Chromatic
+        shell: bash
+        working-directory: app/${{ inputs.working_directory }}
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          # Export any additional env vars passed in as KEY=VALUE lines.
+          if [[ -n "${{ inputs.extra_env }}" ]]; then
+            while IFS= read -r line; do
+              [[ -z "$line" ]] && continue
+              [[ "$line" =~ ^[[:space:]]*# ]] && continue
+              if [[ "$line" == *"="* ]]; then
+                export "$line"
+              fi
+            done <<< "${{ inputs.extra_env }}"
+          fi
+
+          if [[ -n "${{ inputs.chromatic_command }}" ]]; then
+            CMD="${{ inputs.chromatic_command }}"
+          else
+            if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
+              CMD="pnpm chromatic:ci"
+            else
+              CMD="npm run chromatic:ci"
+            fi
+          fi
+
+          echo "Running: $CMD"
+          eval "$CMD"

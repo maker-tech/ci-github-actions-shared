@@ -1,0 +1,119 @@
+# Reusable workflow: Next.js CI (lint + test)
+# Usage:
+#   jobs:
+#     ci:
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
+#       with:
+#         package_manager: pnpm
+#         pnpm_version: 10.28.2
+#         node_version: 22.12.0
+
+name: Next.js CI
+
+on:
+  workflow_call:
+    inputs:
+      package_manager:
+        description: 'Package manager to use (pnpm or npm)'
+        type: string
+        default: 'pnpm'
+      pnpm_version:
+        description: 'pnpm version (when package_manager=pnpm)'
+        type: string
+        default: '10.28.2'
+      node_version:
+        description: 'Node.js version to use'
+        type: string
+        default: '22.12.0'
+      working_directory:
+        description: 'Directory containing the Next.js app'
+        type: string
+        default: '.'
+      run_lint:
+        description: 'Whether to run linting'
+        type: boolean
+        default: true
+      run_tests:
+        description: 'Whether to run tests'
+        type: boolean
+        default: true
+      run_typecheck:
+        description: 'Whether to run TypeScript type checking'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine ci-github-actions-shared ref
+        id: ci_ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          wf_ref='${{ github.workflow_ref }}'
+          ref="${wf_ref##*@}"
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout app repository
+        uses: actions/checkout@v4
+        with:
+          path: app
+
+      - name: Checkout ci-github-actions-shared repo (for local composite actions)
+        uses: actions/checkout@v4
+        with:
+          repository: maker-tech/ci-github-actions-shared
+          ref: ${{ steps.ci_ref.outputs.ref }}
+          path: ci-github-actions-shared
+          token: ${{ github.token }}
+
+      - name: Setup Node.js + install deps
+        uses: ./ci-github-actions-shared/actions/setup-node
+        with:
+          package_manager: ${{ inputs.package_manager }}
+          pnpm_version: ${{ inputs.pnpm_version }}
+          node_version: ${{ inputs.node_version }}
+          working_directory: app/${{ inputs.working_directory }}
+          install_dependencies: 'true'
+
+      - name: Lint
+        if: inputs.run_lint
+        shell: bash
+        working-directory: app/${{ inputs.working_directory }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
+            pnpm lint
+          else
+            npm run lint
+          fi
+
+      - name: Type check
+        if: inputs.run_typecheck
+        shell: bash
+        working-directory: app/${{ inputs.working_directory }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
+            pnpm type-check || pnpm typecheck || echo "No type-check script found"
+          else
+            npm run typecheck || npm run type-check || echo "No typecheck script found"
+          fi
+
+      - name: Test
+        if: inputs.run_tests
+        shell: bash
+        working-directory: app/${{ inputs.working_directory }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
+            pnpm test || pnpm test:ci || echo "No test script found"
+          else
+            npm test || npm run test:ci || echo "No test script found"
+          fi

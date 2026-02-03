@@ -1,0 +1,32 @@
+[
+  {
+    "name": "dependencies",
+    "color": "0366d6",
+    "description": "Dependency updates"
+  },
+  {
+    "name": "automated",
+    "color": "ededed",
+    "description": "Automated PR"
+  },
+  {
+    "name": "dev-deps",
+    "color": "1d76db",
+    "description": "Development dependency updates"
+  },
+  {
+    "name": "prod-deps",
+    "color": "d93f0b",
+    "description": "Production dependency updates"
+  },
+  {
+    "name": "github-actions",
+    "color": "000000",
+    "description": "GitHub Actions updates"
+  },
+  {
+    "name": "security",
+    "color": "b60205",
+    "description": "Security vulnerability fix"
+  }
+]
