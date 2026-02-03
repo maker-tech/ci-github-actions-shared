@@ -8,13 +8,10 @@
 
 ### Type of Change:
 
-<!--- Check all that apply --->
+<!--- PR title must follow Conventional Commits (enforced by CI) --->
+<!--- Examples: feat: ..., fix: ..., feat!: ..., docs: ..., chore: ... --->
 
-- [ ] 🐛 Bug fix (non-breaking change that fixes an issue)
-- [ ] ✨ New feature (non-breaking change that adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing workflows to fail)
-- [ ] 📝 Documentation update
-- [ ] 🔧 Maintenance (refactoring, dependencies, CI config)
+- [ ] 💥 This is a **breaking change** (complete the Breaking Changes section below)
 
 ### Changes:
 
@@ -68,9 +65,8 @@ N/A
 ## Documentation:
 
 - [ ] Input parameters are documented with descriptions
-- [ ] ONBOARDING.md updated (if adding new workflows)
+- [ ] README.md updated (if adding new workflows)
 - [ ] Inline comments explain non-obvious logic
-- [ ] CHANGELOG.md updated with user-facing changes
 
 ---
 
@@ -83,15 +79,3 @@ N/A
 - [ ] Version pinning used for third-party actions (SHA or tag, not `@main`)
 - [ ] Backward compatible with existing consumers (or breaking change documented)
 - [ ] Tested with at least one consuming repository
-
----
-
-## Versioning:
-
-<!--- After merge, what version bump is needed? --->
-
-- [ ] **Patch** (v1.0.x) - Bug fixes, minor improvements
-- [ ] **Minor** (v1.x.0) - New features, backward compatible
-- [ ] **Major** (vX.0.0) - Breaking changes
-
-<!--- Reminder: After merge, create a release tag following semver --->
