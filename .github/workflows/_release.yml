@@ -24,7 +24,7 @@ jobs:
       sync_branch: '' # No dev branch in this repo
       skip_on_empty: true
     secrets:
-      ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   update-major-tag:
@@ -39,7 +39,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Update major version tag
