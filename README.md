@@ -79,11 +79,11 @@ Add the required secrets to your repository:
 
 **Settings → Secrets and variables → Actions**
 
-| Secret                    | Required For              |
-| ------------------------- | ------------------------- |
-| `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     |
-| `ADMIN_GITHUB_TOKEN`      | Branch promotion/releases |
-| `SLACK_WEBHOOK`           | Slack notifications       |
+| Secret                    | Required For              | Permissions                                                                 |
+| ------------------------- | ------------------------- | --------------------------------------------------------------------------- |
+| `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     | Chromatic project token                                                     |
+| `CI_GITHUB_TOKEN`         | Branch promotion/releases | Fine-grained PAT with **Contents: Read and write** on the target repository |
+| `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                  |
 
 ## Common Wrapper Examples
 
@@ -126,7 +126,7 @@ jobs:
       source_branch: dev
       target_branch: uat
     secrets:
-      ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
@@ -149,7 +149,7 @@ jobs:
       release_branch: main
       sync_branch: dev
     secrets:
-      ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
@@ -225,10 +225,10 @@ Merge one branch into another (always creates a merge commit). Common use: `dev 
 
 **Secrets:**
 
-| Name                 | Required |
-| -------------------- | -------- |
-| `ADMIN_GITHUB_TOKEN` | Yes      |
-| `SLACK_WEBHOOK`      | No       |
+| Name               | Required | Notes                                                                       |
+| ------------------ | -------- | --------------------------------------------------------------------------- |
+| `CI_GITHUB_TOKEN`  | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
+| `SLACK_WEBHOOK`    | No       | Slack incoming webhook URL                                                  |
 
 ---
 
@@ -248,10 +248,10 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 
 **Secrets:**
 
-| Name                 | Required |
-| -------------------- | -------- |
-| `ADMIN_GITHUB_TOKEN` | Yes      |
-| `SLACK_WEBHOOK`      | No       |
+| Name               | Required | Notes                                                                       |
+| ------------------ | -------- | --------------------------------------------------------------------------- |
+| `CI_GITHUB_TOKEN`  | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
+| `SLACK_WEBHOOK`    | No       | Slack incoming webhook URL                                                  |
 
 ---
 
