@@ -1,61 +1,35 @@
-# Changelog
+## 1.0.0 (2026-02-11)
 
-All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### ⚠ BREAKING CHANGES
 
-## [Unreleased]
+* consumers must update their secret references from
+ADMIN_GITHUB_TOKEN to CI_GITHUB_TOKEN.
 
-### Added
+Co-authored-by: Cursor <cursoragent@cursor.com>
 
-- Initial repository structure
-- Reusable workflows:
-  - `nextjs-ci.yml` - Lint, typecheck, and test (pnpm default, Node 22)
-  - `deploy-chromatic.yml` - Deploy to Chromatic
-  - `promote-branch.yml` - Merge one branch into another
-  - `release-version.yml` - Conventional changelog + GitHub release
-  - `lint-pr-title.yml` - Validate PR titles follow Conventional Commits
-- Composite actions:
-  - `setup-node` - Standardised Node.js setup with pnpm/npm caching
-  - `nextjs-build` - Build Next.js applications
-- Documentation:
-  - README with client onboarding guide
-  - PR template for workflow changes
-  - CODEOWNERS for review requirements
+* docs: update README with CI_GITHUB_TOKEN name and permissions
 
-### Notes
+- Rename all ADMIN_GITHUB_TOKEN references to CI_GITHUB_TOKEN
+- Add Permissions column to the secrets quick-start table
+- Add Notes column to promote-branch and release-version secrets
+  tables documenting the required fine-grained PAT permissions
+  (Contents: Read and write)
 
-- Vercel deployment workflows not included - use Vercel's native GitHub integration instead
-- Docker/GCP workflows can be added when needed
+Co-authored-by: Cursor <cursoragent@cursor.com>
 
----
+### Features
 
-## Versioning Guide
+* add common actions ([2886e7c](https://github.com/maker-tech/ci-github-actions-shared/commit/2886e7c6ab118a3f7089db20ba575d9ecbd28766))
 
-When releasing:
 
-- **Patch** (v1.0.x): Bug fixes, minor improvements, documentation updates
-- **Minor** (v1.x.0): New features, new workflows, backward-compatible changes
-- **Major** (vX.0.0): Breaking changes that require client updates
+### Bug Fixes
 
-### Creating a Release
+* avoid referencing secrets in step-level if conditions ([05de5d6](https://github.com/maker-tech/ci-github-actions-shared/commit/05de5d62bb73f09c8860f29649494258c1dae863))
+* rename ADMIN_GITHUB_TOKEN to CI_GITHUB_TOKEN ([#5](https://github.com/maker-tech/ci-github-actions-shared/issues/5)) ([b42ff6f](https://github.com/maker-tech/ci-github-actions-shared/commit/b42ff6f4627c5bb863dd4a9e6b8e7eae99639970))
 
-```bash
-# Tag the release
-git tag v1.0.0
-git push origin v1.0.0
 
-# For major versions, also update the floating tag
-git tag -f v1
-git push -f origin v1
-```
+### Reverts
 
-### Client Upgrade Path
+* Revert "chore(release): v0.1.0 [skip ci]" ([c1577fc](https://github.com/maker-tech/ci-github-actions-shared/commit/c1577fc257e4e045b20c15aa33af157837f95e0f))
 
-When making breaking changes (major version):
-
-1. Document what will break in this changelog
-2. List affected workflows
-3. Provide migration steps
-4. Announce via appropriate channels before merging

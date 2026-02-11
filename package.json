@@ -1,33 +1,33 @@
 {
-	"name": "ci-github-actions-shared",
-	"version": "0.1.0",
-	"private": true,
-	"description": "Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications",
-	"keywords": [
-		"github-actions",
-		"ci",
-		"cd",
-		"reusable-workflows",
-		"nextjs",
-		"chromatic",
-		"renovate-preset"
-	],
-	"homepage": "https://github.com/maker-tech/ci-github-actions-shared#readme",
-	"bugs": {
-		"url": "https://github.com/maker-tech/ci-github-actions-shared/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/maker-tech/ci-github-actions-shared.git"
-	},
-	"license": "UNLICENSED",
-	"author": "Maker Tech",
-	"renovate-config": {
-		"default": {
-			"description": "Shareable Renovate preset for repos inheriting ci-github-actions-shared workflows",
-			"extends": [
-				"local>maker-tech/ci-github-actions-shared"
-			]
-		}
-	}
+  "name": "ci-github-actions-shared",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications",
+  "keywords": [
+    "github-actions",
+    "ci",
+    "cd",
+    "reusable-workflows",
+    "nextjs",
+    "chromatic",
+    "renovate-preset"
+  ],
+  "homepage": "https://github.com/maker-tech/ci-github-actions-shared#readme",
+  "bugs": {
+    "url": "https://github.com/maker-tech/ci-github-actions-shared/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maker-tech/ci-github-actions-shared.git"
+  },
+  "license": "UNLICENSED",
+  "author": "Maker Tech",
+  "renovate-config": {
+    "default": {
+      "description": "Shareable Renovate preset for repos inheriting ci-github-actions-shared workflows",
+      "extends": [
+        "local>maker-tech/ci-github-actions-shared"
+      ]
+    }
+  }
 }
