@@ -74,8 +74,14 @@ jobs:
           git merge --no-ff "origin/${{ inputs.source_branch }}" -m "$MSG"
           git push origin "${{ inputs.target_branch }}"
 
+      - name: Check Slack webhook availability
+        id: slack
+        if: failure()
+        shell: bash
+        run: echo "available=${{ secrets.SLACK_WEBHOOK != '' }}" >> "$GITHUB_OUTPUT"
+
       - name: Send Slack notification on failure
-        if: failure() && secrets.SLACK_WEBHOOK != ''
+        if: failure() && steps.slack.outputs.available == 'true'
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: ${{ job.status }}
