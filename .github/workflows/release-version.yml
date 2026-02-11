@@ -109,8 +109,14 @@ jobs:
           git push origin "${{ inputs.sync_branch }}"
         continue-on-error: true
 
+      - name: Check Slack webhook availability
+        id: slack
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        shell: bash
+        run: echo "available=${{ secrets.SLACK_WEBHOOK != '' }}" >> "$GITHUB_OUTPUT"
+
       - name: Send Slack notification of release version on success
-        if: steps.changelog.outputs.skipped == 'false' && secrets.SLACK_WEBHOOK != '' && (inputs.sync_branch == '' || steps.merge_to_sync.outcome == 'success')
+        if: steps.changelog.outputs.skipped == 'false' && steps.slack.outputs.available == 'true' && (inputs.sync_branch == '' || steps.merge_to_sync.outcome == 'success')
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: 'good'
@@ -121,7 +127,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Send Slack notification of merge failure
-        if: steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' && secrets.SLACK_WEBHOOK != '' && steps.merge_to_sync.outcome == 'failure'
+        if: steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' && steps.slack.outputs.available == 'true' && steps.merge_to_sync.outcome == 'failure'
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: 'warning'
