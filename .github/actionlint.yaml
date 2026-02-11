@@ -4,4 +4,4 @@ paths:
     ignore:
       # Reusable workflows (workflow_call) receive secrets from the caller;
       # actionlint doesn't recognize secrets in that context.
-      - "Unrecognized named-value: 'secrets'"
+      - "Unrecognized named-value: 'secrets'.*"
