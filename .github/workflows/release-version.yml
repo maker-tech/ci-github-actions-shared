@@ -110,7 +110,7 @@ jobs:
         continue-on-error: true
 
       - name: Send Slack notification of release version on success
-        if: ${{ steps.changelog.outputs.skipped == 'false' && secrets.SLACK_WEBHOOK != '' && (inputs.sync_branch == '' || steps.merge_to_sync.outcome == 'success') }}
+        if: steps.changelog.outputs.skipped == 'false' && secrets.SLACK_WEBHOOK != '' && (inputs.sync_branch == '' || steps.merge_to_sync.outcome == 'success')
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: 'good'
@@ -121,7 +121,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
       - name: Send Slack notification of merge failure
-        if: ${{ steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' && secrets.SLACK_WEBHOOK != '' && steps.merge_to_sync.outcome == 'failure' }}
+        if: steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' && secrets.SLACK_WEBHOOK != '' && steps.merge_to_sync.outcome == 'failure'
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: 'warning'
@@ -132,6 +132,4 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
     outputs:
-      tag:
-        description: 'Release tag that was created'
-        value: ${{ steps.changelog.outputs.tag }}
+      tag: ${{ steps.changelog.outputs.tag }}

@@ -75,7 +75,7 @@ jobs:
           git push origin "${{ inputs.target_branch }}"
 
       - name: Send Slack notification on failure
-        if: ${{ failure() && secrets.SLACK_WEBHOOK != '' }}
+        if: failure() && secrets.SLACK_WEBHOOK != ''
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: ${{ job.status }}
