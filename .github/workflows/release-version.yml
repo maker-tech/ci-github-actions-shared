@@ -15,7 +15,7 @@
 #         release_branch: main
 #         sync_branch: dev
 #       secrets:
-#         ADMIN_GITHUB_TOKEN: ${{ secrets.SOME_ADMIN_TOKEN }}
+#         CI_GITHUB_TOKEN: ${{ secrets.SOME_ADMIN_TOKEN }}
 #         SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 #
 
@@ -45,7 +45,7 @@ on:
         type: boolean
         default: false
     secrets:
-      ADMIN_GITHUB_TOKEN:
+      CI_GITHUB_TOKEN:
         description: 'Admin token for protected branches and creating releases'
         required: true
       SLACK_WEBHOOK:
@@ -71,14 +71,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          token: ${{ secrets.CI_GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Conventional Changelog Action
         id: changelog
         uses: TriPSs/conventional-changelog-action@84dadaf2c367cb52af02737cd9c7e888807219e7
         with:
-          github-token: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+          github-token: ${{ secrets.CI_GITHUB_TOKEN }}
           preset: ${{ inputs.preset }}
           output-file: ${{ inputs.output_file }}
           skip-on-empty: ${{ inputs.skip_on_empty }}
