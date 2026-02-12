@@ -72,7 +72,8 @@ N/A
 
 ## Review Checklist:
 
-- [ ] Workflow syntax is valid (`actionlint` passes or manually verified)
+- [ ] Workflow syntax is valid (`actionlint` runs automatically on PRs that touch workflow files)
+- [ ] `secrets.*` is NOT used in step-level `if` conditions ([see docs](https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability))
 - [ ] Inputs have sensible defaults where appropriate
 - [ ] Error handling covers common failure scenarios
 - [ ] Slack/notification steps use `if: failure()` correctly
