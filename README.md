@@ -38,10 +38,10 @@ This repository provides centralised CI/CD pipelines that:
 
 Workflows prefixed with an underscore (`_`) are **internal to this repository** and should not be referenced by other repositories. These handle CI/CD for this repo itself.
 
-| Workflow               | Description                                       |
-| ---------------------- | ------------------------------------------------- |
-| `_release.yml`         | Releases this repo and updates major version tags |
-| `_lint-workflows.yml`  | Runs actionlint on PRs that touch workflow files  |
+| Workflow              | Description                                       |
+| --------------------- | ------------------------------------------------- |
+| `_release.yml`        | Releases this repo and updates major version tags |
+| `_lint-workflows.yml` | Runs actionlint on PRs that touch workflow files  |
 
 ## Quick Start
 
@@ -122,6 +122,7 @@ on:
 
 jobs:
   promote:
+    name: 'Promote Dev to UAT'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
     with:
       source_branch: dev
@@ -145,6 +146,7 @@ on:
 
 jobs:
   release:
+    name: 'Create Release'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
     with:
       release_branch: main
@@ -226,10 +228,10 @@ Merge one branch into another (always creates a merge commit). Common use: `dev 
 
 **Secrets:**
 
-| Name               | Required | Notes                                                                       |
-| ------------------ | -------- | --------------------------------------------------------------------------- |
-| `CI_GITHUB_TOKEN`  | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
-| `SLACK_WEBHOOK`    | No       | Slack incoming webhook URL                                                  |
+| Name              | Required | Notes                                                                       |
+| ----------------- | -------- | --------------------------------------------------------------------------- |
+| `CI_GITHUB_TOKEN` | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
+| `SLACK_WEBHOOK`   | No       | Slack incoming webhook URL                                                  |
 
 ---
 
@@ -249,10 +251,10 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 
 **Secrets:**
 
-| Name               | Required | Notes                                                                       |
-| ------------------ | -------- | --------------------------------------------------------------------------- |
-| `CI_GITHUB_TOKEN`  | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
-| `SLACK_WEBHOOK`    | No       | Slack incoming webhook URL                                                  |
+| Name              | Required | Notes                                                                       |
+| ----------------- | -------- | --------------------------------------------------------------------------- |
+| `CI_GITHUB_TOKEN` | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
+| `SLACK_WEBHOOK`   | No       | Slack incoming webhook URL                                                  |
 
 ---
 
