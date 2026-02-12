@@ -1,4 +1,16 @@
-## 1.0.0 (2026-02-11)
+## [1.1.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.0.0...v1.1.0) (2026-02-12)
+
+
+### Features
+
+* **ci:** add automated actionlint and document workflow authoring rules ([#8](https://github.com/maker-tech/ci-github-actions-shared/issues/8)) ([eea427d](https://github.com/maker-tech/ci-github-actions-shared/commit/eea427d4ea935f5fd44151a60fc63df0b799b633))
+
+
+### Bug Fixes
+
+* **ci:** dereference major version tag to commit and document convention ([#7](https://github.com/maker-tech/ci-github-actions-shared/issues/7)) ([7b50870](https://github.com/maker-tech/ci-github-actions-shared/commit/7b5087044088661831e757beab800844d3639fa4))
+
+## [1.0.0](https://github.com/maker-tech/ci-github-actions-shared/compare/2886e7c6ab118a3f7089db20ba575d9ecbd28766...v1.0.0) (2026-02-11)
 
 
 ### ⚠ BREAKING CHANGES
