@@ -17,7 +17,7 @@ on:
 
 jobs:
   release:
-    name: Create Release
+    name: Create Release Locally
     uses: ./.github/workflows/release-version.yml
     with:
       release_branch: main
