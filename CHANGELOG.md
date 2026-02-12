@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.1.0...v1.1.1) (2026-02-12)
+
+
+### Bug Fixes
+
+* **ci:** update Slack webhook secret name in _release.yml ([#10](https://github.com/maker-tech/ci-github-actions-shared/issues/10)) ([c277c29](https://github.com/maker-tech/ci-github-actions-shared/commit/c277c292cf622aea5a1a05f41bf796fc7a6523e2))
+
 ## [1.1.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.0.0...v1.1.0) (2026-02-12)
 
 
