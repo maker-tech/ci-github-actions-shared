@@ -1,0 +1,31 @@
+# Internal workflow: Lint PR title on pull requests, using Conventional Commits
+#
+# This workflow is intended for INTERNAL use within this repository to validate
+# PR titles against the Conventional Commits specification.
+#
+# If you want to enable PR title linting in your own repository, use the reusable
+# workflow provided at:
+#   maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml
+#
+# Usage (for other repos):
+#   on:
+#     pull_request:
+#       types: [opened, edited, synchronize, reopened]
+#   jobs:
+#     lint:
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+#
+# This internal workflow simply triggers on relevant PR events and calls the
+# reusable workflow in this repo via a local reference.
+#
+# Naming convention: workflows prefixed with underscore (_) are for internal use.
+
+name: '[Internal] Lint PR Title'
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint-pr-title.yml

@@ -42,7 +42,7 @@ permissions:
   contents: write
 
 jobs:
-  promote:
+  promote-to-branch:
     runs-on: ubuntu-latest
 
     steps:
