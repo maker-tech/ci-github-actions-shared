@@ -1,0 +1,10 @@
+# actionlint config: https://github.com/rhysd/actionlint/blob/main/docs/config.md
+#
+# Targeted suppressions for known actionlint limitations.
+paths:
+  .github/workflows/_release.yml:
+    ignore:
+      # actionlint cannot resolve outputs from reusable workflow calls
+      # (release-version.yml declares `tag` as an output, but actionlint
+      # treats workflow_call job outputs as an empty object).
+      - 'property "tag" is not defined in object type'
