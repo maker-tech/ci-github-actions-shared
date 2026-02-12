@@ -1,7 +1,0 @@
-# actionlint config: https://github.com/rhysd/actionlint/blob/main/docs/config.md
-paths:
-  .github/workflows/**/*.{yml,yaml}:
-    ignore:
-      # Reusable workflows (workflow_call) receive secrets from the caller;
-      # actionlint doesn't recognize secrets in that context.
-      - "Unrecognized named-value: 'secrets'.*"

@@ -81,7 +81,7 @@ jobs:
         run: echo "available=${{ secrets.SLACK_WEBHOOK != '' }}" >> "$GITHUB_OUTPUT"
 
       - name: Send Slack notification on failure
-        if: failure() && steps.slack.outputs.available == 'true'
+        if: ${{ failure() && steps.slack.outputs.available == 'true' }}
         uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
         env:
           SLACK_COLOR: ${{ job.status }}

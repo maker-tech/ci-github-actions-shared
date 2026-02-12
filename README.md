@@ -317,6 +317,18 @@ This repository follows semantic versioning:
 
 This repo uses its own `release-version.yml` workflow (via `_release.yml`) to create releases. When a new version is released, the major version tag (e.g., `v1`) is automatically updated to point to it.
 
+> **Maintainer note — major version tags:**
+> The `_release.yml` workflow automatically force-updates the major version tag (e.g., `v1`) whenever a new `v1.x.x` release is created. This allows consumers to reference `@v1` and always get the latest compatible version.
+>
+> If you ever need to do this manually:
+>
+> ```bash
+> git tag -fa v1 v1.x.x^{} -m "Update v1 to v1.x.x"
+> git push origin v1 --force
+> ```
+>
+> Replace `v1.x.x` with the actual tag (e.g., `v1.2.3`). The `^{}` dereferences the annotated tag to the underlying commit.
+
 **You control when to upgrade** by changing the version tag in your workflow files.
 
 ```yaml
