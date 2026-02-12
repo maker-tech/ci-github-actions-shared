@@ -38,9 +38,10 @@ This repository provides centralised CI/CD pipelines that:
 
 Workflows prefixed with an underscore (`_`) are **internal to this repository** and should not be referenced by other repositories. These handle CI/CD for this repo itself.
 
-| Workflow       | Description                                       |
-| -------------- | ------------------------------------------------- |
-| `_release.yml` | Releases this repo and updates major version tags |
+| Workflow               | Description                                       |
+| ---------------------- | ------------------------------------------------- |
+| `_release.yml`         | Releases this repo and updates major version tags |
+| `_lint-workflows.yml`  | Runs actionlint on PRs that touch workflow files  |
 
 ## Quick Start
 
@@ -393,6 +394,40 @@ The shared workflows will not:
 - Support custom hacks via flags
 
 **If your use case doesn't fit:** Request a new workflow, not a workaround.
+
+## Contributing — Workflow Authoring Rules
+
+When adding or editing workflows in this repository, keep these rules in mind:
+
+### Do not use `secrets.*` in step-level `if` conditions
+
+The `secrets` context is [not available](https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability) in `jobs.<id>.steps.if`. actionlint (which runs automatically on PRs via `_lint-workflows.yml`) enforces this and will fail the check.
+
+**Instead**, evaluate the secret in a `run` step and expose the result as a step output:
+
+```yaml
+# Evaluate secret availability (secrets IS available in `run`)
+- name: Check Slack webhook
+  id: slack
+  run: echo "available=${{ secrets.SLACK_WEBHOOK != '' }}" >> "$GITHUB_OUTPUT"
+
+# Gate on the output (steps.* IS available in `if`)
+- name: Send Slack notification
+  if: ${{ steps.slack.outputs.available == 'true' }}
+  uses: rtCamp/action-slack-notify@...
+```
+
+### Pin third-party actions by SHA
+
+Always reference third-party actions by their full commit SHA, not a mutable tag:
+
+```yaml
+# Good
+uses: rtCamp/action-slack-notify@c58b60ee33df2229ed2d2eed86eeaf7e6c527c5a
+
+# Bad
+uses: rtCamp/action-slack-notify@v2
+```
 
 ## Getting Help
 
