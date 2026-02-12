@@ -1,0 +1,50 @@
+# Internal workflow: Lint GitHub Actions workflow files
+#
+# Runs actionlint via reviewdog on pull requests that touch workflow files.
+# Reports issues as inline PR review comments.
+#
+# Naming convention: Workflows prefixed with underscore (_) are internal to this
+# repository and should not be referenced by other repositories.
+#
+# NOTE for contributors — known actionlint limitations with reusable workflows:
+#
+#   The `secrets` context is NOT available in step-level `if` conditions per the
+#   official GitHub Actions context availability table. actionlint enforces this
+#   strictly and will report "Unrecognized named-value: 'secrets'" if you use
+#   `secrets.*` in a step `if`.
+#
+#   Workaround: evaluate the secret in a `run` step (where secrets ARE available)
+#   and expose the result as a step output. Then reference the output in `if`.
+#
+#   Example:
+#     - name: Check secret availability
+#       id: check
+#       run: echo "available=${{ secrets.MY_SECRET != '' }}" >> "$GITHUB_OUTPUT"
+#
+#     - name: Use secret conditionally
+#       if: ${{ steps.check.outputs.available == 'true' }}
+#       run: echo "Secret is set"
+#
+#   See: https://docs.github.com/en/actions/learn-github-actions/contexts#context-availability
+
+name: '[Internal] Lint Workflows'
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run actionlint with reviewdog
+        uses: reviewdog/action-actionlint@e58ee9d111489c31395fbe4857b0be6e7635dbda # v1.70.0
+        with:
+          reporter: github-pr-review
+          fail_level: error
