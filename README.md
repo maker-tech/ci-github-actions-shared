@@ -69,8 +69,13 @@ jobs:
     uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
     with:
       package_manager: pnpm
-      pnpm_version: 10.28.2
-      node_version: 22.12.0
+      ## Defaults (uncomment to override)
+      # pnpm_version: '10.28.2'
+      # node_version: '22.12.0'
+      # working_directory: '.'
+      # run_lint: true
+      # run_tests: true
+      # run_typecheck: true
 ```
 
 > **Important:** Always reference a version tag (e.g., `@v1`). Never use `@main`.
@@ -107,10 +112,13 @@ jobs:
     uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
     with:
       package_manager: pnpm
-      pnpm_version: 10.28.2
-      node_version: 22.12.0
-      extra_env: |
-        NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      ## Defaults (uncomment to override)
+      # pnpm_version: '10.28.2'
+      # node_version: '22.12.0'
+      # working_directory: '.'
+      # fetch_depth: 0
+      # chromatic_command: ''
+      # extra_env: ''
     secrets:
       CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 ```
@@ -130,6 +138,8 @@ jobs:
     with:
       source_branch: dev
       target_branch: uat
+      ## Defaults (uncomment to override)
+      # merge_message: ''
     secrets:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
@@ -154,6 +164,10 @@ jobs:
     with:
       release_branch: main
       sync_branch: dev
+      ## Defaults (uncomment to override)
+      # preset: conventionalcommits #options: conventionalcommits,eslint
+      # output_file: CHANGELOG.md
+      # skip_on_empty: false
     secrets:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
@@ -178,7 +192,7 @@ jobs:
       # playwright_version: '1.55.1'
       # axe_core_version: '4.11.0'
       # node_version: '22'
-      # test_browser: chromium
+      # test_browser: chromium  #options: chromium,firefox,webkit
       # shard_total: 4
       # artifact_retention_days: 30
       # fail_screenshots_path: 'tests/functional/screenshots/**'
@@ -252,24 +266,24 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 
 **Inputs:**
 
-| Name                      | Required | Default                           | Description                              |
-| ------------------------- | -------- | --------------------------------- | ---------------------------------------- |
-| `playwright_version`      | No       | `1.55.1`                          | Playwright version                       |
-| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version |
-| `node_version`            | No       | `22`                              | Node.js version                          |
-| `target_url`              | Yes      | -                                 | Target URL to run tests against          |
-| `test_browser`            | No       | `chromium`                        | Browser to install and test with         |
-| `shard_total`             | No       | `4`                               | Number of parallel shards                |
-| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts       |
-| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots              |
+| Name                      | Required | Default                           | Description                                                         |
+| ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------- |
+| `playwright_version`      | No       | `1.55.1`                          | Playwright version                                                  |
+| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                           |
+| `node_version`            | No       | `22`                              | Node.js version                                                     |
+| `target_url`              | Yes      | -                                 | Target URL to run tests against                                     |
+| `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit ) |
+| `shard_total`             | No       | `4`                               | Number of parallel shards                                           |
+| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts                                  |
+| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots                                         |
 
 **Secrets:**
 
-| Name                 | Required | Notes                                          |
-| -------------------- | -------- | ---------------------------------------------- |
-| `BASIC_AUTH_USER`    | No       | Basic auth username for protected environments |
+| Name                  | Required | Notes                                          |
+| --------------------- | -------- | ---------------------------------------------- |
+| `BASIC_AUTH_USER`     | No       | Basic auth username for protected environments |
 | `BASIC_AUTH_PASSWORD` | No       | Basic auth password for protected environments |
-| `SLACK_WEBHOOK`      | No       | Slack incoming webhook URL                     |
+| `SLACK_WEBHOOK`       | No       | Slack incoming webhook URL                     |
 
 ---
 
