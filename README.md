@@ -453,7 +453,32 @@ That's it. The preset handles everything else.
 
 **Critical packages** (get individual PRs):
 
-`next`, `react`, `react-dom`, `next-auth`, `tailwindcss`, `typescript`, `zod`, `@tanstack/react-query`, `@sentry/*`, `@builder.io/*`
+`next`, `react`, `react-dom`, `next-auth`, `tailwindcss`, `typescript`, `zod`, `@tanstack/react-query`
+
+**Adding project-specific critical packages:**
+
+If your project uses additional packages that should get individual PRs (e.g. `@sentry/*`, `@builder.io/*`), extend the preset in your repo's `renovate.json`:
+
+```json
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		"github>maker-tech/ci-github-actions-shared"
+	],
+	"timezone": "Pacific/Auckland",
+	"schedule": ["before 6am on monday"],
+	"packageRules": [
+		{
+			"description": "Project-specific critical packages",
+			"matchPackageNames": ["/^@sentry//", "/^@builder\\.io//"],
+			"labels": ["dependencies", "critical"],
+			"minimumReleaseAge": "14 days",
+			"prPriority": 15
+		}
+	]
+}
+```
 
 **Why inheritance over scaffolding?**
 

@@ -4,21 +4,10 @@
 	"customManagers": [
 		{
 			"customType": "regex",
-			"description": "Track maker-tech/ci-github-actions-shared reusable workflow references",
+			"description": "Track maker-tech/ci-github-actions-shared workflow and action references",
 			"fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
 			"matchStrings": [
-				"uses:\\s*['\"]?maker-tech/ci-github-actions-shared/\\.github/workflows/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
-			],
-			"datasourceTemplate": "github-releases",
-			"depNameTemplate": "maker-tech/ci-github-actions-shared",
-			"versioningTemplate": "semver"
-		},
-		{
-			"customType": "regex",
-			"description": "Track maker-tech/ci-github-actions-shared composite action references",
-			"fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
-			"matchStrings": [
-				"uses:\\s*['\"]?maker-tech/ci-github-actions-shared/actions/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
+				"uses:\\s*['\"]?maker-tech/ci-github-actions-shared/(?:\\.github/workflows|actions)/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
 			],
 			"datasourceTemplate": "github-releases",
 			"depNameTemplate": "maker-tech/ci-github-actions-shared",
@@ -34,7 +23,6 @@
 			"commitMessagePrefix": "chore(ci):",
 			"minimumReleaseAge": "3 days",
 			"prPriority": 25,
-			"semanticCommitScope": "ci",
 			"prBodyNotes": [
 				"Updates inherited CI workflows from `ci-github-actions-shared`.",
 				"",
@@ -50,6 +38,7 @@
 			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
 			"matchUpdateTypes": ["major"],
 			"labels": ["dependencies", "ci-inheritance", "breaking-change"],
+			"minimumReleaseAge": "7 days",
 			"prPriority": 30,
 			"prBodyNotes": [
 				"**BREAKING CHANGE**: Major version update to shared CI workflows.",
@@ -85,9 +74,7 @@
 				"!tailwindcss",
 				"!typescript",
 				"!zod",
-				"!@tanstack/react-query",
-				"!/^@sentry//",
-				"!/^@builder\\.io//"
+				"!@tanstack/react-query"
 			]
 		},
 		{
@@ -103,9 +90,7 @@
 				"tailwindcss",
 				"typescript",
 				"zod",
-				"@tanstack/react-query",
-				"/^@sentry//",
-				"/^@builder\\.io//"
+				"@tanstack/react-query"
 			]
 		},
 		{
@@ -117,7 +102,7 @@
 			"prPriority": 18,
 			"prBodyNotes": [
 				"Ensure Node.js version aligns with `ci-github-actions-shared` defaults.",
-				"Current shared workflow default: `22.12.0`"
+				"Check current default in [setup-node action](https://github.com/maker-tech/ci-github-actions-shared/blob/main/actions/setup-node/action.yml)."
 			]
 		}
 	]
