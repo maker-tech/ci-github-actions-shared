@@ -1,6 +1,6 @@
 {
   "name": "ci-github-actions-shared",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "private": true,
   "description": "Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications",
   "keywords": [
