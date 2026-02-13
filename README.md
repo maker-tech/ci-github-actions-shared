@@ -67,6 +67,7 @@ on:
 
 jobs:
   ci:
+    name: 'CI'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
     with:
       package_manager: pnpm
@@ -110,6 +111,7 @@ on:
 
 jobs:
   chromatic:
+    name: 'Deploy Chromatic'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
     with:
       package_manager: pnpm
@@ -186,6 +188,7 @@ on:
 
 jobs:
   e2e:
+    name: 'E2E Tests'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
     with:
       target_url: https://dev.levande.com.au
@@ -214,6 +217,7 @@ on:
 
 jobs:
   lint:
+    name: 'Lint PR Title'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
 ```
 
