@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.2.0...v1.2.1) (2026-02-13)
+
+
+### Bug Fixes
+
+* **workflows:** include repo name in Slack notification titles ([#13](https://github.com/maker-tech/ci-github-actions-shared/issues/13)) ([c58137d](https://github.com/maker-tech/ci-github-actions-shared/commit/c58137d92c49bdeddec42c03cef84c2d30419888))
+
 ## [1.2.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.1.1...v1.2.0) (2026-02-13)
 
 
