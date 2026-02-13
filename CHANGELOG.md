@@ -1,3 +1,10 @@
+## [1.2.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.1.1...v1.2.0) (2026-02-13)
+
+
+### Features
+
+* **workflows:** add reusable e2e-test workflow ([#11](https://github.com/maker-tech/ci-github-actions-shared/issues/11)) ([d0826ec](https://github.com/maker-tech/ci-github-actions-shared/commit/d0826ec942329712fa6578c33162375f467c29cf))
+
 ## [1.1.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.1.0...v1.1.1) (2026-02-12)
 
 
