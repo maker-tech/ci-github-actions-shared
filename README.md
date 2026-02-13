@@ -30,6 +30,7 @@ This repository provides centralised CI/CD pipelines that:
 | ------------------ | ---------------------- | ---------------------------------------------- |
 | CI only            | `nextjs-ci.yml`        | Lint, typecheck, and test                      |
 | Chromatic          | `deploy-chromatic.yml` | Deploy Chromatic (e.g. on `uat`)               |
+| E2E tests          | `e2e-test.yml`         | Sharded Playwright E2E tests against a URL     |
 | Promote branch     | `promote-branch.yml`   | Merge one branch into another (merge commit)   |
 | Release/versioning | `release-version.yml`  | Conventional changelog + GitHub release + sync |
 | PR title lint      | `lint-pr-title.yml`    | Enforce Conventional Commits PR titles         |
@@ -84,6 +85,8 @@ Add the required secrets to your repository:
 | ------------------------- | ------------------------- | --------------------------------------------------------------------------- |
 | `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     | Chromatic project token                                                     |
 | `CI_GITHUB_TOKEN`         | Branch promotion/releases | Fine-grained PAT with **Contents: Read and write** on the target repository |
+| `BASIC_AUTH_USER`         | E2E tests (optional)      | Basic auth username for protected environments                              |
+| `BASIC_AUTH_PASSWORD`     | E2E tests (optional)      | Basic auth password for protected environments                              |
 | `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                  |
 
 ## Common Wrapper Examples
@@ -156,6 +159,35 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
+### E2E tests on `dev`
+
+```yaml
+name: E2E tests DEV
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
+    with:
+      target_url: https://dev.levande.com.au
+      ## Defaults (uncomment to override)
+      # playwright_version: '1.55.1'
+      # axe_core_version: '4.11.0'
+      # node_version: '22'
+      # test_browser: chromium
+      # shard_total: 4
+      # artifact_retention_days: 30
+      # fail_screenshots_path: 'tests/functional/screenshots/**'
+    secrets:
+      BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
+      BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+```
+
 ### Lint PR title
 
 ```yaml
@@ -211,6 +243,33 @@ Deploy Chromatic (typically used on `uat` or similar).
 | Name                      | Required |
 | ------------------------- | -------- |
 | `CHROMATIC_PROJECT_TOKEN` | Yes      |
+
+---
+
+### e2e-test.yml
+
+Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies (Playwright + Axe only, not full project deps) for fast installs.
+
+**Inputs:**
+
+| Name                      | Required | Default                           | Description                              |
+| ------------------------- | -------- | --------------------------------- | ---------------------------------------- |
+| `playwright_version`      | No       | `1.55.1`                          | Playwright version                       |
+| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version |
+| `node_version`            | No       | `22`                              | Node.js version                          |
+| `target_url`              | Yes      | -                                 | Target URL to run tests against          |
+| `test_browser`            | No       | `chromium`                        | Browser to install and test with         |
+| `shard_total`             | No       | `4`                               | Number of parallel shards                |
+| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts       |
+| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots              |
+
+**Secrets:**
+
+| Name                 | Required | Notes                                          |
+| -------------------- | -------- | ---------------------------------------------- |
+| `BASIC_AUTH_USER`    | No       | Basic auth username for protected environments |
+| `BASIC_AUTH_PASSWORD` | No       | Basic auth password for protected environments |
+| `SLACK_WEBHOOK`      | No       | Slack incoming webhook URL                     |
 
 ---
 
