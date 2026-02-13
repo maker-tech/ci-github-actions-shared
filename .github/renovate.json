@@ -23,15 +23,19 @@
 			"prPriority": 100
 		},
 		{
-			"description": "GitHub Actions - core actions (high trust, auto-merge)",
+			"description": "Pin GitHub Actions digests for SHA-pinning consistency",
+			"matchManagers": ["github-actions"],
+			"pinDigests": true
+		},
+		{
+			"description": "GitHub Actions - core and trusted actions (high trust, auto-merge)",
 			"matchManagers": ["github-actions"],
 			"matchPackageNames": [
 				"actions/checkout",
 				"actions/setup-node",
 				"actions/cache",
 				"actions/upload-artifact",
-				"actions/download-artifact",
-				"actions/github-script"
+				"pnpm/action-setup"
 			],
 			"groupName": "github-actions-core",
 			"labels": ["dependencies", "github-actions"],
@@ -42,14 +46,6 @@
 			"matchUpdateTypes": ["minor", "patch", "digest"]
 		},
 		{
-			"description": "GitHub Actions - pnpm setup",
-			"matchManagers": ["github-actions"],
-			"matchPackageNames": ["pnpm/action-setup"],
-			"labels": ["dependencies", "github-actions"],
-			"minimumReleaseAge": "7 days",
-			"prPriority": 18
-		},
-		{
 			"description": "GitHub Actions - other third-party actions",
 			"matchManagers": ["github-actions"],
 			"matchPackageNames": [
@@ -57,8 +53,6 @@
 				"!actions/setup-node",
 				"!actions/cache",
 				"!actions/upload-artifact",
-				"!actions/download-artifact",
-				"!actions/github-script",
 				"!pnpm/action-setup"
 			],
 			"groupName": "github-actions-third-party",

@@ -95,7 +95,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: buildjet/setup-node@v4
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.node_version }}
 
@@ -111,7 +111,7 @@ jobs:
           npm install @playwright/test@^${{ inputs.playwright_version }} @axe-core/playwright@${{ inputs.axe_core_version }} dotenv
 
       - name: Cache Playwright browsers
-        uses: buildjet/cache@v4
+        uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
