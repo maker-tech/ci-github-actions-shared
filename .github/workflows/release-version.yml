@@ -51,6 +51,10 @@ on:
       SLACK_WEBHOOK:
         description: 'Slack webhook for notifications (optional)'
         required: false
+    outputs:
+      tag:
+        description: 'The released version tag (e.g. v1.2.3), empty if skipped'
+        value: ${{ jobs.release.outputs.tag }}
 
 permissions:
   contents: write
