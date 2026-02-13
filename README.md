@@ -43,6 +43,7 @@ Workflows prefixed with an underscore (`_`) are **internal to this repository** 
 | --------------------- | ------------------------------------------------- |
 | `_release.yml`        | Releases this repo and updates major version tags |
 | `_lint-workflows.yml` | Runs actionlint on PRs that touch workflow files  |
+| `_lint-pr-title.yml`  | Lints PR titles via the reusable `lint-pr-title.yml` |
 
 ## Quick Start
 
