@@ -1,6 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"description": "Shareable Renovate preset for repos inheriting ci-github-actions-shared workflows. Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared\"]",
+	"description": "Shareable Renovate preset for repos inheriting ci-github-actions-shared workflows. Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared:renovate-preset\"]",
 	"customManagers": [
 		{
 			"customType": "regex",

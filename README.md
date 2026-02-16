@@ -513,7 +513,7 @@ This repo provides a **shareable Renovate preset** for consumer repositories. Us
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": [
 		"config:recommended",
-		"github>maker-tech/ci-github-actions-shared"
+		"github>maker-tech/ci-github-actions-shared:renovate-preset"
 	],
 	"timezone": "Pacific/Auckland",
 	"schedule": ["before 6am on monday"]
@@ -546,7 +546,7 @@ If your project uses additional packages that should get individual PRs (e.g. `@
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
 	"extends": [
 		"config:recommended",
-		"github>maker-tech/ci-github-actions-shared"
+		"github>maker-tech/ci-github-actions-shared:renovate-preset"
 	],
 	"timezone": "Pacific/Auckland",
 	"schedule": ["before 6am on monday"],
