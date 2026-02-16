@@ -2,6 +2,29 @@
 
 Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications.
 
+## Contents
+
+- [Available Workflows](#available-workflows)
+- [Quick Start](#quick-start)
+- [Configure Secrets](#3-configure-secrets)
+- [Common Wrapper Examples](#common-wrapper-examples)
+  - [Chromatic on `uat`](#chromatic-on-uat)
+  - [Promote `dev → uat`](#promote-dev--uat-manual)
+  - [Release on `main`](#release-on-main-and-sync-to-dev)
+  - [E2E tests on `dev`](#e2e-tests-on-dev)
+  - [Lint PR title](#lint-pr-title)
+- [Workflow Reference](#workflow-reference)
+- [Composite Actions](#composite-actions)
+- [Environments & Branching](#environments--branching)
+- [Security Model](#security-model)
+- [Versioning & Updates](#versioning--updates)
+- [Automated Updates with Renovate](#automated-updates-with-renovate)
+- [Contributing](#contributing--workflow-authoring-rules)
+- [Getting Help](#getting-help)
+- [FAQ](#faq)
+
+---
+
 ## Defaults
 
 - **Package manager**: `pnpm` (overrideable via inputs)
