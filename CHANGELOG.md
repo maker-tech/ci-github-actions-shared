@@ -1,3 +1,10 @@
+## [1.3.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.2.2...v1.3.0) (2026-02-16)
+
+
+### Features
+
+* **workflows:** add repo-sync-labels workflow and example workflows ([#20](https://github.com/maker-tech/ci-github-actions-shared/issues/20)) ([34c38b9](https://github.com/maker-tech/ci-github-actions-shared/commit/34c38b983b55da26b97b2405aff1ca23f0711d5c))
+
 ## [1.2.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.2.1...v1.2.2) (2026-02-13)
 
 
@@ -25,16 +32,4 @@
 ### Bug Fixes
 
 * **ci:** update Slack webhook secret name in _release.yml ([#10](https://github.com/maker-tech/ci-github-actions-shared/issues/10)) ([c277c29](https://github.com/maker-tech/ci-github-actions-shared/commit/c277c292cf622aea5a1a05f41bf796fc7a6523e2))
-
-## [1.1.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.0.0...v1.1.0) (2026-02-12)
-
-
-### Features
-
-* **ci:** add automated actionlint and document workflow authoring rules ([#8](https://github.com/maker-tech/ci-github-actions-shared/issues/8)) ([eea427d](https://github.com/maker-tech/ci-github-actions-shared/commit/eea427d4ea935f5fd44151a60fc63df0b799b633))
-
-
-### Bug Fixes
-
-* **ci:** dereference major version tag to commit and document convention ([#7](https://github.com/maker-tech/ci-github-actions-shared/issues/7)) ([7b50870](https://github.com/maker-tech/ci-github-actions-shared/commit/7b5087044088661831e757beab800844d3639fa4))
 
