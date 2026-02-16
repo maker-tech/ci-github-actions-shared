@@ -59,6 +59,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: app
+          ref: ${{ github.sha }}
 
       - name: Checkout ci-github-actions-shared repo
         uses: actions/checkout@v4
