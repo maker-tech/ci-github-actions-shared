@@ -1,0 +1,30 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Promote uat to main -- Merge uat branch into main (always creates merge commit)
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml
+#
+# Triggers: manual dispatch only
+# Required secrets: CI_GITHUB_TOKEN (fine-grained PAT with Contents: Read and write)
+# Permissions: contents: write
+
+name: Promote UAT to MAIN
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    name: 'Promote UAT to MAIN'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    with:
+      source_branch: uat   # required -- branch to merge from
+      target_branch: main  # required -- branch to merge into
+      ## Optional (uncomment to override defaults)
+      # merge_message: ''   # Custom merge commit message (blank uses default)
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }} # required -- admin token to push to protected branches
+      ## Optional secrets (uncomment if needed)
+      # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }} # Slack webhook for failure notifications

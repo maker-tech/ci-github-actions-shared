@@ -13,6 +13,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
   - [Release on `main`](#release-on-main-and-sync-to-dev)
   - [E2E tests on `dev`](#e2e-tests-on-dev)
   - [Lint PR title](#lint-pr-title)
+  - [Sync labels](#sync-labels)
 - [Workflow Reference](#workflow-reference)
 - [Composite Actions](#composite-actions)
 - [Environments & Branching](#environments--branching)
@@ -57,6 +58,7 @@ This repository provides centralised CI/CD pipelines that:
 | Promote branch     | `promote-branch.yml`   | Merge one branch into another (merge commit)   |
 | Release/versioning | `release-version.yml`  | Conventional changelog + GitHub release + sync |
 | PR title lint      | `lint-pr-title.yml`    | Enforce Conventional Commits PR titles         |
+| Sync labels        | `repo-sync-labels.yml` | Sync GitHub labels from a shared base config   |
 
 ### Internal Workflows
 
@@ -67,6 +69,7 @@ Workflows prefixed with an underscore (`_`) are **internal to this repository** 
 | `_release.yml`        | Releases this repo and updates major version tags |
 | `_lint-workflows.yml` | Runs actionlint on PRs that touch workflow files  |
 | `_lint-pr-title.yml`  | Lints PR titles via the reusable `lint-pr-title.yml` |
+| `_repo-sync-labels.yml` | Syncs labels for this repo via the reusable `repo-sync-labels.yml` |
 
 ## Quick Start
 
@@ -78,7 +81,7 @@ Select the workflow that matches your deployment target.
 
 Create `.github/workflows/ci.yml` in your repository:
 
-**Example: CI Only**
+**Example: CI Only** (full example: [`examples/nextjs-ci.yml`](examples/nextjs-ci.yml))
 
 ```yaml
 name: CI
@@ -125,6 +128,8 @@ Reusable workflows don’t define triggers for your repo. Add a thin wrapper wor
 
 ### Chromatic on `uat`
 
+> Full example: [`examples/deploy-chromatic.yml`](examples/deploy-chromatic.yml)
+
 ```yaml
 name: Deploy Chromatic
 
@@ -151,6 +156,8 @@ jobs:
 
 ### Promote `dev → uat` (manual)
 
+> Full example: [`examples/promote-dev-to-uat.yml`](examples/promote-dev-to-uat.yml) | [`examples/promote-uat-to-main.yml`](examples/promote-uat-to-main.yml)
+
 ```yaml
 name: Promote dev to uat
 
@@ -175,6 +182,8 @@ jobs:
 ```
 
 ### Release on `main` (and sync to `dev`)
+
+> Full example: [`examples/release-version.yml`](examples/release-version.yml)
 
 ```yaml
 name: Release Version
@@ -207,6 +216,8 @@ jobs:
 
 ### E2E tests on `dev`
 
+> Full example: [`examples/e2e-test.yml`](examples/e2e-test.yml)
+
 ```yaml
 name: E2E tests DEV
 
@@ -237,6 +248,8 @@ jobs:
 
 ### Lint PR title
 
+> Full example: [`examples/lint-pr-title.yml`](examples/lint-pr-title.yml)
+
 ```yaml
 name: Lint PR title
 
@@ -251,6 +264,28 @@ jobs:
   lint:
     name: 'Lint PR Title'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+```
+
+### Sync labels
+
+> Full example: [`examples/repo-sync-labels.yml`](examples/repo-sync-labels.yml)
+
+```yaml
+name: Repo - Sync Labels
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+    ## Defaults (uncomment to override)
+    # with:
+    #   extra_labels_file: .github/repo-labels.json
+    #   delete_other_labels: false
+    permissions:
+      contents: read
+      issues: write
 ```
 
 ## Workflow Reference
@@ -373,6 +408,19 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 Validate PR titles follow Conventional Commits.
 
 **Inputs:** None
+
+---
+
+### repo-sync-labels.yml
+
+Sync GitHub labels from a shared base config. Applies a standard set of labels (dependencies, automated, dev-deps, prod-deps, github-actions, security) from the shared repo. Consumer repos can optionally provide additional labels.
+
+**Inputs:**
+
+| Name                 | Required | Default | Description                                          |
+| -------------------- | -------- | ------- | ---------------------------------------------------- |
+| `extra_labels_file`  | No       | -       | Path to additional labels JSON in the consumer repo  |
+| `delete_other_labels`| No       | `false` | Whether to delete labels not defined in config       |
 
 ## Composite Actions
 
