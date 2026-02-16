@@ -134,6 +134,9 @@ name: Promote dev to uat
 on:
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   promote:
     name: 'Promote Dev to UAT'
@@ -159,6 +162,9 @@ on:
     paths-ignore:
       - package.json
       - CHANGELOG.md
+
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -214,6 +220,9 @@ name: Lint PR title
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
 
 jobs:
   lint:
@@ -387,6 +396,8 @@ The shared workflows do not enforce environment rules. For Vercel, use their nat
 - Secrets are **never shared** between repositories
 - No access to other client repositories
 - No access to this organisation's secrets
+
+> **Permissions:** Each shared workflow declares the minimum `GITHUB_TOKEN` permissions it needs. However, due to GitHub's intersection model, the calling workflow must also declare at least the same permissions. If your repository uses restrictive default permissions, add a `permissions` block to your wrapper workflow. See the [Common Wrapper Examples](#common-wrapper-examples) for the correct values.
 
 ## Versioning & Updates
 
