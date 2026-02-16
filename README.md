@@ -134,6 +134,9 @@ name: Promote dev to uat
 on:
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   promote:
     name: 'Promote Dev to UAT'
@@ -159,6 +162,9 @@ on:
     paths-ignore:
       - package.json
       - CHANGELOG.md
+
+permissions:
+  contents: write
 
 jobs:
   release:
@@ -214,6 +220,9 @@ name: Lint PR title
 on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
 
 jobs:
   lint:
