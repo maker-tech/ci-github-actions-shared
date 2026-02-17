@@ -23,6 +23,7 @@ jobs:
       release_branch: main
       sync_branch: '' # No dev branch in this repo
       skip_on_empty: true
+      release_count: 0 # Keep all releases in CHANGELOG.md (default is 5)
     secrets:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL_MAKER_GITHUB }}
