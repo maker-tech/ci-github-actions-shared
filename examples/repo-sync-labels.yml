@@ -23,6 +23,7 @@ jobs:
     uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
     ## Optional (uncomment to override defaults)
     # with:
+    #   ci_ref: main                                  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
     #   extra_labels_file: .github/repo-labels.json  # Path to additional labels JSON in your repo
     #   delete_other_labels: false                    # Whether to delete labels not in config
     permissions:
