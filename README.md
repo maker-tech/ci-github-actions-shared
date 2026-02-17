@@ -209,6 +209,7 @@ jobs:
       # preset: conventionalcommits #options: conventionalcommits,eslint
       # output_file: CHANGELOG.md
       # skip_on_empty: false
+      # release_count: 5            # Releases to keep in changelog (0 = all)
     secrets:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
