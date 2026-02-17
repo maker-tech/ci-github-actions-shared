@@ -44,6 +44,10 @@ on:
         description: 'Skip release if no commits match (false = always create releases)'
         type: boolean
         default: false
+      release_count:
+        description: 'Number of releases to preserve in the changelog (0 = keep all, default: 5)'
+        type: number
+        default: 5
     secrets:
       CI_GITHUB_TOKEN:
         description: 'Admin token for protected branches and creating releases'
@@ -86,6 +90,7 @@ jobs:
           preset: ${{ inputs.preset }}
           output-file: ${{ inputs.output_file }}
           skip-on-empty: ${{ inputs.skip_on_empty }}
+          release-count: ${{ inputs.release_count }}
 
       - name: Release
         uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
