@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.0...v1.4.1) (2026-02-17)
+
+
+### Bug Fixes
+
+* **workflows:** replace github.workflow_ref with ci_ref input for shared repo checkout ([#25](https://github.com/maker-tech/ci-github-actions-shared/issues/25)) ([9036b84](https://github.com/maker-tech/ci-github-actions-shared/commit/9036b8434507535180cf29aa9dc08720f0f44044))
+
 ## [1.4.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.3.1...v1.4.0) (2026-02-17)
 
 
