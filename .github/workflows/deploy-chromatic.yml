@@ -9,6 +9,7 @@
 #         package_manager: pnpm
 #         pnpm_version: 10.28.2
 #         working_directory: .
+#         # ci_ref: main  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
 #         # Optional: pass extra environment variables as KEY=VALUE lines
 #         extra_env: |
 #           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
@@ -21,6 +22,10 @@ name: Deploy Chromatic
 on:
   workflow_call:
     inputs:
+      ci_ref:
+        description: 'Ref of ci-github-actions-shared to checkout (tag, branch, or SHA). Defaults to main.'
+        type: string
+        default: 'main'
       package_manager:
         description: 'Package manager to use (pnpm or npm)'
         type: string
@@ -62,26 +67,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Determine ci-github-actions-shared ref
-        id: ci_ref
-        shell: bash
-        run: |
-          set -euo pipefail
-          wf_ref='${{ github.workflow_ref }}'
-          ref="${wf_ref##*@}"
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-
       - name: Checkout app repository
         uses: actions/checkout@v4
         with:
           path: app
+          ref: ${{ github.sha }}
           fetch-depth: ${{ inputs.fetch_depth }}
 
       - name: Checkout ci-github-actions-shared repo (for local composite actions)
         uses: actions/checkout@v4
         with:
           repository: maker-tech/ci-github-actions-shared
-          ref: ${{ steps.ci_ref.outputs.ref }}
+          ref: ${{ inputs.ci_ref }}
           path: ci-github-actions-shared
           token: ${{ github.token }}
 
@@ -108,6 +105,7 @@ jobs:
               [[ -z "$line" ]] && continue
               [[ "$line" =~ ^[[:space:]]*# ]] && continue
               if [[ "$line" == *"="* ]]; then
+                # shellcheck disable=SC2163
                 export "$line"
               fi
             done <<< "${{ inputs.extra_env }}"

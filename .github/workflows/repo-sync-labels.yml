@@ -18,6 +18,7 @@
 #       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
 #       with:
 #         extra_labels_file: .github/repo-labels.json
+#         # ci_ref: main  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
 #       permissions:
 #         contents: read
 #         issues: write
@@ -27,6 +28,10 @@ name: Repo - Sync Labels
 on:
   workflow_call:
     inputs:
+      ci_ref:
+        description: 'Ref of ci-github-actions-shared to checkout (tag, branch, or SHA). Defaults to main.'
+        type: string
+        default: 'main'
       extra_labels_file:
         description: 'Path to an additional labels JSON file in the consumer repo (relative to repo root). Leave empty to only use the base labels from the shared repo.'
         type: string
@@ -46,25 +51,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Determine ci-github-actions-shared ref
-        id: ci_ref
-        shell: bash
-        run: |
-          set -euo pipefail
-          wf_ref='${{ github.workflow_ref }}'
-          ref="${wf_ref##*@}"
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-
       - name: Checkout consumer repository
         uses: actions/checkout@v4
         with:
           path: app
+          ref: ${{ github.sha }}
 
       - name: Checkout ci-github-actions-shared repo
         uses: actions/checkout@v4
         with:
           repository: maker-tech/ci-github-actions-shared
-          ref: ${{ steps.ci_ref.outputs.ref }}
+          ref: ${{ inputs.ci_ref }}
           path: ci-github-actions-shared
           token: ${{ github.token }}
 
