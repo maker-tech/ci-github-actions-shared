@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.1...v1.4.2) (2026-02-18)
+
+
+### Bug Fixes
+
+* **ci:** add cursor rule to enforce fix(ci) prefix for CI changes ([#32](https://github.com/maker-tech/ci-github-actions-shared/issues/32)) ([b2fcea5](https://github.com/maker-tech/ci-github-actions-shared/commit/b2fcea58bb30cc4bc5d0d54d528ea2cbf3d9d468))
+
 ## [1.4.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.0...v1.4.1) (2026-02-17)
 
 
