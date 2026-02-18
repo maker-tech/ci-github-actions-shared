@@ -1,0 +1,23 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Lint PR Title -- Validate PR titles follow Conventional Commits specification
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml
+#
+# Triggers: pull request opened, edited, synchronize, reopened
+# Required secrets: none
+# Permissions: pull-requests: read
+
+name: Lint PR Title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    name: 'Lint PR Title'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+    ## This workflow has no inputs or secrets.

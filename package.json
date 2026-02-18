@@ -1,6 +1,6 @@
 {
   "name": "ci-github-actions-shared",
-  "version": "1.2.2",
+  "version": "1.4.1",
   "private": true,
   "description": "Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications",
   "keywords": [
@@ -23,10 +23,10 @@
   "license": "UNLICENSED",
   "author": "Maker Tech",
   "renovate-config": {
-    "default": {
+    "renovate-preset": {
       "description": "Shareable Renovate preset for repos inheriting ci-github-actions-shared workflows",
       "extends": [
-        "local>maker-tech/ci-github-actions-shared"
+        "local>maker-tech/ci-github-actions-shared:renovate-preset"
       ]
     }
   }

@@ -1,0 +1,44 @@
+# Internal workflow: Sync GitHub labels for this repository
+#
+# This workflow is intended for INTERNAL use within this repository to keep
+# GitHub labels in sync with .github/repo-labels.json using the shared
+# repo-sync-labels.yml workflow.
+#
+# If you want to enable label syncing in your own repository, use the reusable
+# workflow provided at:
+#   maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml
+#
+# Usage (for other repos):
+#   on:
+#     workflow_dispatch:
+#   jobs:
+#     sync-labels:
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+#       permissions:
+#         contents: read
+#         issues: write
+#
+# This internal workflow triggers on changes to .github/repo-labels.json and
+# calls the reusable workflow in this repo via a local reference.
+#
+# The shared workflow applies a standard set of labels (e.g. for Renovate/PR
+# categorization).
+# Naming convention: workflows prefixed with underscore (_) are for internal use.
+
+name: '[Internal] Sync Labels'
+
+on:
+  # Run when repo-labels.json changes
+  push:
+    branches: [dev]
+    paths:
+      - '.github/repo-labels.json'
+  # Trigger manually
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    uses: ./.github/workflows/repo-sync-labels.yml
+    permissions:
+      contents: read
+      issues: write

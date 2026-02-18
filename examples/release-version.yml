@@ -1,0 +1,37 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Release Version -- Conventional changelog, GitHub release, and branch sync
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml
+#
+# Triggers: push to main (excluding package.json and CHANGELOG.md to prevent loops)
+# Required secrets: CI_GITHUB_TOKEN (fine-grained PAT with Contents: Read and write)
+# Permissions: contents: write
+
+name: Release Version
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 'Create Release'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    with:
+      release_branch: main # required -- branch where releases are created
+      sync_branch: dev     # required -- branch to sync after release (set to '' to disable)
+      ## Optional (uncomment to override defaults)
+      # preset: conventionalcommits  # Changelog preset -- options: conventionalcommits, eslint
+      # output_file: CHANGELOG.md    # Changelog output file
+      # skip_on_empty: false         # Skip release if no conventional commits found
+      # release_count: 5               # Releases to keep in changelog (0 = all)
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }} # required -- admin token for protected branches and releases
+      ## Optional secrets (uncomment if needed)
+      # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }} # Slack webhook for release/failure notifications

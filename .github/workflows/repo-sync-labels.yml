@@ -1,0 +1,89 @@
+# Reusable workflow: Sync GitHub labels
+#
+# Syncs the repository's GitHub labels from a base set of labels defined in this
+# shared repo (.github/repo-labels.json). Consumer repos can optionally provide
+# an additional labels file for repo-specific labels.
+#
+# Usage:
+#   jobs:
+#     sync-labels:
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+#       permissions:
+#         contents: read
+#         issues: write
+#
+# Usage with extra consumer-specific labels:
+#   jobs:
+#     sync-labels:
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+#       with:
+#         extra_labels_file: .github/repo-labels.json
+#         # ci_ref: main  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
+#       permissions:
+#         contents: read
+#         issues: write
+
+name: Repo - Sync Labels
+
+on:
+  workflow_call:
+    inputs:
+      ci_ref:
+        description: 'Ref of ci-github-actions-shared to checkout (tag, branch, or SHA). Defaults to main.'
+        type: string
+        default: 'main'
+      extra_labels_file:
+        description: 'Path to an additional labels JSON file in the consumer repo (relative to repo root). Leave empty to only use the base labels from the shared repo.'
+        type: string
+        default: ''
+      delete_other_labels:
+        description: 'Whether to delete labels not defined in config'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  sync-labels:
+    name: Sync Labels
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout consumer repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          path: app
+          ref: ${{ github.sha }}
+
+      - name: Checkout ci-github-actions-shared repo
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          repository: maker-tech/ci-github-actions-shared
+          ref: ${{ inputs.ci_ref }}
+          path: ci-github-actions-shared
+          token: ${{ github.token }}
+
+      - name: Build config-file list
+        id: config
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_files="ci-github-actions-shared/.github/repo-labels.json"
+          if [[ -n "${{ inputs.extra_labels_file }}" ]]; then
+            config_files="${config_files}"$'\n'"app/${{ inputs.extra_labels_file }}"
+          fi
+          # Use heredoc to handle multiline output
+          {
+            echo "files<<EOF"
+            echo "$config_files"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Sync labels
+        uses: EndBug/label-sync@52074158190acb45f3077f9099fea818aa43f97a # v2
+        with:
+          config-file: ${{ steps.config.outputs.files }}
+          delete-other-labels: ${{ inputs.delete_other_labels }}
+          dry-run: false
