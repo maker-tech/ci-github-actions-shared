@@ -82,7 +82,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Sync labels
-        uses: EndBug/label-sync@v2
+        uses: EndBug/label-sync@52074158190acb45f3077f9099fea818aa43f97a # v2
         with:
           config-file: ${{ steps.config.outputs.files }}
           delete-other-labels: ${{ inputs.delete_other_labels }}
