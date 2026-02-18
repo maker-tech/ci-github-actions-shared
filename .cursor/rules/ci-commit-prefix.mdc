@@ -1,0 +1,21 @@
+---
+description: Use fix(ci) commit prefix for CI workflow and action changes so they trigger patch releases
+globs: .github/workflows/**/*.yml,.github/workflows/**/*.yaml,actions/**/*.yml,actions/**/*.yaml
+alwaysApply: false
+---
+
+# CI Commit Prefix Convention
+
+When creating git commits for changes to workflow or action YAML files, use the `fix(ci):` prefix. This ensures dependency updates and CI configuration changes trigger a patch release via conventional-changelog (the `chore:` and `ci:` prefixes do not produce a version bump).
+
+## Examples
+
+```
+fix(ci): update actions/setup-node to v6
+fix(ci): disable package manager cache in e2e workflow
+fix(ci): pin third-party action dependencies
+```
+
+## Why not `chore(ci):`?
+
+The release workflow uses `TriPSs/conventional-changelog-action` with the `conventionalcommits` preset. Only `feat:`, `fix:`, and `perf:` prefixes trigger version bumps. Using `chore:` or `ci:` means the change is invisible to the release process and consumers never get a new tag to pin to.
