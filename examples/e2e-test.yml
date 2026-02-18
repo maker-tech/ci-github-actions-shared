@@ -1,0 +1,43 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# E2E Tests -- Sharded Playwright E2E tests against a target URL
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml
+#
+# Triggers: push to dev (excluding docs/config changes), manual dispatch
+# Required secrets: none (BASIC_AUTH_USER, BASIC_AUTH_PASSWORD, SLACK_WEBHOOK are optional)
+# Permissions: contents: read (default)
+
+name: E2E Tests DEV
+
+on:
+  push:
+    branches: [dev]
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.cursor/**'
+      - 'docs/**'
+      - '**/*.md'
+      - 'package.json'
+      - 'CHANGELOG.md'
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: 'E2E Tests'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
+    with:
+      target_url: https://dev.example.com # required -- target URL to run tests against
+      ## Optional (uncomment to override defaults)
+      # playwright_version: '1.55.1'                          # Playwright version
+      # axe_core_version: '4.11.0'                            # Axe accessibility testing library version
+      # node_version: '22'                                    # Node.js version
+      # test_browser: chromium                                # options: chromium, firefox, webkit
+      # shard_total: 4                                        # Number of parallel shards
+      # artifact_retention_days: 30                           # Days to keep test report artifacts
+      # fail_screenshots_path: 'tests/functional/screenshots/**' # Path to failure screenshots
+    secrets:
+      ## Optional secrets (uncomment if needed)
+      # BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}         # Basic auth username for protected environments
+      # BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }} # Basic auth password for protected environments
+      # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}        # Slack webhook for failure notifications

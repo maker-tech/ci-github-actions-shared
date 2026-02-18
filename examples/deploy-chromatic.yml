@@ -1,0 +1,43 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Deploy Chromatic -- Build and deploy Storybook to Chromatic
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml
+#
+# Triggers: push to uat (excluding docs/config changes)
+# Required secrets: CHROMATIC_PROJECT_TOKEN
+# Permissions: contents: read (default)
+
+name: Deploy Chromatic
+
+on:
+  push:
+    branches: [uat]
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.cursor/**'
+      - 'docs/**'
+      - '**/*.md'
+      - 'package.json'
+      - 'CHANGELOG.md'
+  workflow_dispatch:
+
+jobs:
+  chromatic:
+    name: 'Deploy Chromatic'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
+    with:
+      package_manager: pnpm # required -- options: pnpm, npm
+      ## Optional (uncomment to override defaults)
+      # ci_ref: main                  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
+      # pnpm_version: '10.28.2'      # pnpm version (when package_manager=pnpm)
+      # node_version: '22.12.0'      # Node.js version
+      # working_directory: '.'        # Directory containing the app
+      # fetch_depth: 0                # Git fetch depth (0 for full history)
+      # chromatic_command: ''          # Custom Chromatic command (blank uses default: pnpm chromatic:ci)
+      # extra_env: ''                 # Extra env vars as newline-separated KEY=VALUE pairs
+      ## Example extra_env with Cloudinary:
+      # extra_env: |
+      #   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+    secrets:
+      CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }} # required

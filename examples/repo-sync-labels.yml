@@ -1,0 +1,31 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Repo - Sync Labels -- Sync GitHub labels from a shared base config
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml
+#
+# The shared workflow applies a standard set of labels (e.g. for Renovate/PR
+# categorization) from the shared repo. To add repo-specific labels on top of
+# the base set, create a .github/repo-labels.json in your repo and pass it
+# via extra_labels_file.
+#
+# Triggers: manual dispatch
+# Required secrets: none
+# Permissions: contents: read, issues: write
+
+name: Repo - Sync Labels
+
+on:
+  # Trigger manually
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+    ## Optional (uncomment to override defaults)
+    # with:
+    #   ci_ref: main                                  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
+    #   extra_labels_file: .github/repo-labels.json  # Path to additional labels JSON in your repo
+    #   delete_other_labels: false                    # Whether to delete labels not in config
+    permissions:
+      contents: read
+      issues: write

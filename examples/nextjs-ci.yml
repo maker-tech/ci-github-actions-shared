@@ -1,0 +1,36 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Next.js CI -- Lint, typecheck, and test
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml
+#
+# Triggers: pull requests (excluding docs/config changes)
+# Required secrets: none
+# Permissions: contents: read (default)
+
+name: CI
+
+on:
+  pull_request:
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.cursor/**'
+      - 'docs/**'
+      - '**/*.md'
+      - 'package.json'
+      - 'CHANGELOG.md'
+
+jobs:
+  ci:
+    name: 'CI'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
+    with:
+      package_manager: pnpm # required -- options: pnpm, npm
+      ## Optional (uncomment to override defaults)
+      # ci_ref: main                  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
+      # pnpm_version: '10.28.2'      # pnpm version (when package_manager=pnpm)
+      # node_version: '22.12.0'      # Node.js version
+      # working_directory: '.'        # Directory containing the Next.js app
+      # run_lint: true                # Run linting
+      # run_tests: true               # Run tests
+      # run_typecheck: true           # Run TypeScript type checking

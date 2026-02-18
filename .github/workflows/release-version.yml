@@ -44,6 +44,10 @@ on:
         description: 'Skip release if no commits match (false = always create releases)'
         type: boolean
         default: false
+      release_count:
+        description: 'Number of releases to preserve in the changelog (0 = keep all, default: 5)'
+        type: number
+        default: 5
     secrets:
       CI_GITHUB_TOKEN:
         description: 'Admin token for protected branches and creating releases'
@@ -80,15 +84,16 @@ jobs:
 
       - name: Conventional Changelog Action
         id: changelog
-        uses: TriPSs/conventional-changelog-action@84dadaf2c367cb52af02737cd9c7e888807219e7
+        uses: TriPSs/conventional-changelog-action@1abec007de15e5b2b14cce780f02245e4722e862
         with:
           github-token: ${{ secrets.CI_GITHUB_TOKEN }}
           preset: ${{ inputs.preset }}
           output-file: ${{ inputs.output_file }}
           skip-on-empty: ${{ inputs.skip_on_empty }}
+          release-count: ${{ inputs.release_count }}
 
       - name: Release
-        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b
+        uses: softprops/action-gh-release@e798e6a1ede8d07b74ac4cdac6bdfa4cc1653907
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         with:
           tag_name: ${{ steps.changelog.outputs.tag }}
