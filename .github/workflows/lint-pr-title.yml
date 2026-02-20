@@ -8,12 +8,19 @@
 #   jobs:
 #     lint:
 #       uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+#       with:
+#         preset: eslint  # default: conventionalcommits
 #
 
 name: Lint PR title
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      preset:
+        description: 'Commit convention preset (conventionalcommits or eslint)'
+        type: string
+        default: 'conventionalcommits'
 
 permissions:
   pull-requests: read
@@ -24,6 +31,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate
+        if: inputs.preset != 'eslint'
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Validate (eslint preset)
+        if: inputs.preset == 'eslint'
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        with:
+          types: |
+            fix
+            update
+            new
+            breaking
+            docs
+            build
+            upgrade
+            chore
         env:
           GITHUB_TOKEN: ${{ github.token }}

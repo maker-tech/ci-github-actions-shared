@@ -20,4 +20,6 @@ jobs:
   lint:
     name: 'Lint PR Title'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
-    ## This workflow has no inputs or secrets.
+    ## Defaults (uncomment to override)
+    # with:
+    #   preset: conventionalcommits  #options: conventionalcommits,eslint
