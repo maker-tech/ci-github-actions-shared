@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.2...v1.4.3) (2026-02-20)
+
+
+### Bug Fixes
+
+* **ci:** add preset input to lint-pr-title workflow ([#33](https://github.com/maker-tech/ci-github-actions-shared/issues/33)) ([969b6c5](https://github.com/maker-tech/ci-github-actions-shared/commit/969b6c5e5e74ace1cdc5835a13ebc4350c099c4c))
+
 ## [1.4.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.1...v1.4.2) (2026-02-18)
 
 
