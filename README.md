@@ -285,6 +285,9 @@ jobs:
   lint:
     name: 'Lint PR Title'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+    ## Defaults (uncomment to override)
+    # with:
+    #   preset: conventionalcommits  #options: conventionalcommits,eslint
 ```
 
 ### Sync labels
@@ -427,9 +430,13 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 
 ### lint-pr-title.yml
 
-Validate PR titles follow Conventional Commits.
+Validate PR titles follow Conventional Commits (or eslint conventions).
 
-**Inputs:** None
+**Inputs:**
+
+| Name     | Required | Default               | Description                                                  |
+| -------- | -------- | --------------------- | ------------------------------------------------------------ |
+| `preset` | No       | `conventionalcommits` | Commit convention preset (`conventionalcommits` or `eslint`) |
 
 ---
 
