@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.4...v1.4.5) (2026-03-02)
+
+
+### Bug Fixes
+
+* **ci:** add skip_automated_commits input for deployment_status release pattern ([#35](https://github.com/maker-tech/ci-github-actions-shared/issues/35)) ([ed8ab15](https://github.com/maker-tech/ci-github-actions-shared/commit/ed8ab158dbed01fed8bbb64cdba4bd1d6b0bdd22))
+
 ## [1.4.4](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.3...v1.4.4) (2026-03-02)
 
 
