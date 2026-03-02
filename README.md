@@ -1,6 +1,7 @@
 # CI Client Workflows (ci-github-actions-shared)
 
 > [!NOTE] We do not accept PRs from external users.
+> .
 
 Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications.
 
@@ -208,6 +209,7 @@ jobs:
 > Full example: [`examples/release-version.yml`](examples/release-version.yml)
 >
 > **Tip:** To create releases only after successful deployment, use either:
+>
 > - [Release after Vercel auto-deployment](#release-after-vercel-auto-deployment) -- for platforms with native auto-deploy (Vercel, Netlify)
 > - [Promote, Deploy & Release](#promote-deploy--release-consolidated) -- for platforms where you deploy via GitHub Actions (CLI, AWS, GCP)
 
@@ -505,15 +507,15 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 
 **Inputs:**
 
-| Name             | Required | Default               | Description                             |
-| ---------------- | -------- | --------------------- | --------------------------------------- |
-| `release_branch` | No       | `main`                | Branch where releases are created       |
-| `sync_branch`    | No       | `dev`                 | Branch to sync after release            |
-| `preset`         | No       | `conventionalcommits` | Changelog preset                        |
-| `output_file`    | No       | `CHANGELOG.md`        | Changelog file path                     |
-| `skip_on_empty`  | No       | `false`               | Skip release if no changes              |
-| `release_count`  | No       | `5`                   | Releases to keep in changelog (0 = all) |
-| `skip_automated_commits` | No | `false`            | Skip if last commit is from github-actions[bot] |
+| Name                     | Required | Default               | Description                                     |
+| ------------------------ | -------- | --------------------- | ----------------------------------------------- |
+| `release_branch`         | No       | `main`                | Branch where releases are created               |
+| `sync_branch`            | No       | `dev`                 | Branch to sync after release                    |
+| `preset`                 | No       | `conventionalcommits` | Changelog preset                                |
+| `output_file`            | No       | `CHANGELOG.md`        | Changelog file path                             |
+| `skip_on_empty`          | No       | `false`               | Skip release if no changes                      |
+| `release_count`          | No       | `5`                   | Releases to keep in changelog (0 = all)         |
+| `skip_automated_commits` | No       | `false`               | Skip if last commit is from github-actions[bot] |
 
 **Secrets:**
 
