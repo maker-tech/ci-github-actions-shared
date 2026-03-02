@@ -50,7 +50,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
 - **Package manager**: `pnpm` (overrideable via inputs)
 - **Node.js**: `22.12.0` (overrideable via inputs)
 
-> **Note**: For Vercel deployments, use Vercel's native GitHub integration (auto-deploys on push). These workflows focus on CI, Chromatic, and release automation.
+> **Note**: For Vercel deployments, use the [Deploy via Vercel CLI + Release](#deploy-via-vercel-cli--release) pattern to deploy via the Vercel CLI and create releases in a single workflow.
 
 ## Purpose
 
@@ -321,8 +321,8 @@ Workflows for creating releases and managing deployments. Choose the pattern tha
 >
 > **Tip:** To create releases only after successful deployment, use either:
 >
-> - [Release after Vercel auto-deployment](#release-after-vercel-auto-deployment) -- for platforms with native auto-deploy (Vercel, Netlify)
-> - [Promote, Deploy & Release](#promote-deploy--release-consolidated) -- for platforms where you deploy via GitHub Actions (CLI, AWS, GCP)
+> - [Deploy via Vercel CLI + Release](#deploy-via-vercel-cli--release) -- deploy to Vercel via CLI, then release
+> - [Promote, Deploy & Release](#promote-deploy--release-consolidated) -- for platforms where you deploy via GitHub Actions (AWS, GCP, or manual dispatch)
 
 ```yaml
 name: Release Version
@@ -354,39 +354,66 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
-#### Release after Vercel auto-deployment
+#### Deploy via Vercel CLI + Release
 
-> Full example: [`examples/release-on-vercel-auto-deployment.yml`](examples/release-on-vercel-auto-deployment.yml)
+> Full example: [`examples/deploy-vercel-cli-release.yml`](examples/deploy-vercel-cli-release.yml)
 
-Use this pattern when your hosting platform auto-deploys on push and reports deployment status back to GitHub (e.g. Vercel, Netlify). The release is only created after a successful production deployment -- no phantom releases if the deploy fails.
+Use this pattern to deploy to Vercel via the CLI and create a release in a single workflow. The release is only created after a successful production deployment -- no phantom releases if the deploy fails.
+
+Loop prevention is built-in: the conventional-changelog-action tags version bump commits with `[skip ci]`, and `paths-ignore` on `package.json`/`CHANGELOG.md` provides a secondary safeguard.
 
 ```yaml
-name: Release Version
+name: Deploy & Release
 
 on:
-  deployment_status:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
 
 permissions:
   contents: write
 
 jobs:
+  deploy:
+    name: 'Deploy to Vercel'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Deploy to Production
+        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
   release:
     name: 'Create Release'
-    if: >-
-      github.event.deployment_status.state == 'success' &&
-      github.event.deployment_status.environment == 'Production'
+    needs: deploy
     uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
     with:
       release_branch: main
       sync_branch: dev
-      skip_automated_commits: true
     secrets:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
 ```
 
-> **Important:** The `deployment_status` environment name varies by platform. Vercel uses `Production` (capital P). Check your platform's documentation or inspect a deployment status event in your repo's Actions tab.
->
-> When using this pattern, remove any separate `release-version.yml` workflow that triggers on `push` to `main` -- otherwise you will get duplicate releases.
+**Setup checklist:**
+
+1. **Skip production auto-deploys** -- add a `vercel.json` to your project root so Vercel only auto-deploys preview branches (production is handled by this workflow):
+
+   ```json
+   {
+     "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then exit 0; else exit 1; fi"
+   }
+   ```
+
+   - Preview / dev / UAT branch pushes trigger automatic Vercel preview deployments (`exit 1` = proceed)
+   - Production (`main`) pushes are skipped (`exit 0` = ignore), deployed by this workflow instead
+
+2. **Add required secrets** to your repository: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (find org and project IDs in `.vercel/project.json` or the Vercel dashboard), and `CI_GITHUB_TOKEN` (fine-grained PAT with Contents: Read and write).
+
+3. **Remove any separate `release-version.yml`** workflow that triggers on `push` to `main` -- otherwise you will get duplicate releases.
 
 #### Promote, Deploy & Release (consolidated)
 
@@ -575,7 +602,6 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 | `output_file`            | No       | `CHANGELOG.md`        | Changelog file path                             |
 | `skip_on_empty`          | No       | `false`               | Skip release if no changes                      |
 | `release_count`          | No       | `5`                   | Releases to keep in changelog (0 = all)         |
-| `skip_automated_commits` | No       | `false`               | Skip if deployed commit is from github-actions[bot] (falls back to branch HEAD for non-deployment triggers) |
 
 **Secrets:**
 

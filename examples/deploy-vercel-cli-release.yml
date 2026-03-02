@@ -1,0 +1,77 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Deploy to Vercel via CLI + Release — pushes to main trigger a production
+# deployment via the Vercel CLI, then create a conventional changelog release
+# and sync the release branch into the sync branch (e.g., main → dev).
+#
+# Loop prevention: the conventional-changelog-action tags version bump commits
+# with [skip ci], which prevents the push trigger from firing again. The
+# paths-ignore on package.json and CHANGELOG.md provides a secondary safeguard.
+#
+# Flow: push to main → deploy via Vercel CLI → release (shared)
+#
+# Calls:
+#   - maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml
+#
+# Triggers: push to main (excluding package.json and CHANGELOG.md)
+# Required secrets:
+#   - CI_GITHUB_TOKEN  (fine-grained PAT with Contents: Read and write)
+#   - VERCEL_TOKEN     (Vercel personal access token or team token)
+#   - VERCEL_ORG_ID    (Vercel org/team ID — find in .vercel/project.json or Vercel dashboard)
+#   - VERCEL_PROJECT_ID (Vercel project ID — find in .vercel/project.json or Vercel dashboard)
+# Permissions: contents: write
+#
+# SETUP: Add a vercel.json to your project root to skip production auto-deploys
+# while keeping preview deploys for non-main branches:
+#
+#   {
+#     "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then exit 0; else exit 1; fi"
+#   }
+#
+#   - Preview / dev / UAT branch pushes → automatic Vercel preview deployments (exit 1 = proceed)
+#   - Production (main) pushes → skipped (exit 0 = ignore), deployed by this workflow instead
+#
+# IMPORTANT: When using this pattern, remove any separate release-version.yml
+# workflow that triggers on push to main — otherwise you will get duplicate releases.
+
+name: Deploy & Release
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: 'Deploy to Vercel'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Deploy to Production
+        run: npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  release:
+    name: 'Create Release'
+    needs: deploy
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    with:
+      release_branch: main # required -- branch where releases are created
+      sync_branch: dev     # required -- branch to sync after release (set to '' to disable)
+      ## Optional (uncomment to override defaults)
+      # preset: conventionalcommits  # Changelog preset -- options: conventionalcommits, eslint
+      # output_file: CHANGELOG.md    # Changelog output file
+      # skip_on_empty: false         # Skip release if no conventional commits found
+      # release_count: 5             # Releases to keep in changelog (0 = all)
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }} # required -- admin token for protected branches and releases
+      ## Optional secrets (uncomment if needed)
+      # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }} # Slack webhook for release/failure notifications
