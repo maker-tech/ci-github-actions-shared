@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.3...v1.4.4) (2026-03-02)
+
+
+### Bug Fixes
+
+* **ci:** support consolidated promote-deploy-release orchestration ([#34](https://github.com/maker-tech/ci-github-actions-shared/issues/34)) ([272b807](https://github.com/maker-tech/ci-github-actions-shared/commit/272b8074e84c2fead331bf98188c9eefb07a8a41))
+
 ## [1.4.3](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.2...v1.4.3) (2026-02-20)
 
 
