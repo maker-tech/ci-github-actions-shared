@@ -20,6 +20,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
     - [Chromatic on `uat`](#chromatic-on-uat)
     - [Promote `dev → uat` (manual)](#promote-dev--uat-manual)
     - [Release on `main` (and sync to `dev`)](#release-on-main-and-sync-to-dev)
+    - [Release after Vercel auto-deployment](#release-after-vercel-auto-deployment)
     - [Promote, Deploy \& Release (consolidated)](#promote-deploy--release-consolidated)
     - [E2E tests on `dev`](#e2e-tests-on-dev)
     - [Lint PR title](#lint-pr-title)
@@ -206,7 +207,9 @@ jobs:
 
 > Full example: [`examples/release-version.yml`](examples/release-version.yml)
 >
-> **Tip:** If you need to verify that production deployment succeeds before creating a release, see [Promote, Deploy & Release (consolidated)](#promote-deploy--release-consolidated) instead.
+> **Tip:** To create releases only after successful deployment, use either:
+> - [Release after Vercel auto-deployment](#release-after-vercel-auto-deployment) -- for platforms with native auto-deploy (Vercel, Netlify)
+> - [Promote, Deploy & Release](#promote-deploy--release-consolidated) -- for platforms where you deploy via GitHub Actions (CLI, AWS, GCP)
 
 ```yaml
 name: Release Version
@@ -237,6 +240,40 @@ jobs:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
+
+### Release after Vercel auto-deployment
+
+> Full example: [`examples/release-on-vercel-auto-deployment.yml`](examples/release-on-vercel-auto-deployment.yml)
+
+Use this pattern when your hosting platform auto-deploys on push and reports deployment status back to GitHub (e.g. Vercel, Netlify). The release is only created after a successful production deployment -- no phantom releases if the deploy fails.
+
+```yaml
+name: Release Version
+
+on:
+  deployment_status:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: 'Create Release'
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment_status.environment == 'Production'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    with:
+      release_branch: main
+      sync_branch: dev
+      skip_automated_commits: true
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+```
+
+> **Important:** The `deployment_status` environment name varies by platform. Vercel uses `Production` (capital P). Check your platform's documentation or inspect a deployment status event in your repo's Actions tab.
+>
+> When using this pattern, remove any separate `release-version.yml` workflow that triggers on `push` to `main` -- otherwise you will get duplicate releases.
 
 ### Promote, Deploy & Release (consolidated)
 
@@ -456,9 +493,9 @@ Merge one branch into another (always creates a merge commit). Common use: `dev 
 
 **Outputs:**
 
-| Name        | Description                                        |
-| ----------- | -------------------------------------------------- |
-| `merge_sha` | The merge commit SHA pushed to the target branch   |
+| Name        | Description                                      |
+| ----------- | ------------------------------------------------ |
+| `merge_sha` | The merge commit SHA pushed to the target branch |
 
 ---
 
@@ -476,6 +513,7 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 | `output_file`    | No       | `CHANGELOG.md`        | Changelog file path                     |
 | `skip_on_empty`  | No       | `false`               | Skip release if no changes              |
 | `release_count`  | No       | `5`                   | Releases to keep in changelog (0 = all) |
+| `skip_automated_commits` | No | `false`            | Skip if last commit is from github-actions[bot] |
 
 **Secrets:**
 

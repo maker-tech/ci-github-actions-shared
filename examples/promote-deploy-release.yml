@@ -17,6 +17,10 @@
 # IMPORTANT: When using this consolidated pattern, remove any separate
 # release-version.yml workflow that triggers on push to main — otherwise
 # you will get duplicate releases.
+#
+# TIP: If your platform auto-deploys on push (e.g. Vercel native integration),
+# use examples/release-on-vercel-auto-deployment.yml instead — it's simpler
+# and doesn't require deploying via GitHub Actions.
 
 name: Promote, Deploy & Release
 
