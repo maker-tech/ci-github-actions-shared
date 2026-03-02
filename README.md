@@ -575,7 +575,7 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 | `output_file`            | No       | `CHANGELOG.md`        | Changelog file path                             |
 | `skip_on_empty`          | No       | `false`               | Skip release if no changes                      |
 | `release_count`          | No       | `5`                   | Releases to keep in changelog (0 = all)         |
-| `skip_automated_commits` | No       | `false`               | Skip if last commit is from github-actions[bot] |
+| `skip_automated_commits` | No       | `false`               | Skip if deployed commit is from github-actions[bot] (falls back to branch HEAD for non-deployment triggers) |
 
 **Secrets:**
 

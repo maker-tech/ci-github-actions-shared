@@ -5,7 +5,7 @@
 #
 # Only creates a release when:
 #   1. The production deployment succeeds
-#   2. The last commit is not automated (prevents loops from version bump deploys)
+#   2. The deployed commit is not automated (prevents loops from version bump deploys)
 #
 # Use this pattern when your platform auto-deploys on push and reports back
 # via GitHub Deployment Status events. For platforms where you deploy via
