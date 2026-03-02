@@ -163,6 +163,9 @@ Add the required secrets to your repository:
 | `BASIC_AUTH_USER`         | E2E tests (optional)      | Basic auth username for protected environments                              |
 | `BASIC_AUTH_PASSWORD`     | E2E tests (optional)      | Basic auth password for protected environments                              |
 | `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                  |
+| `VERCEL_TOKEN`            | Vercel CLI deploys        | Vercel access token scoped to the correct team                              |
+| `VERCEL_ORG_ID`           | Vercel CLI deploys        | Vercel org/team ID (`team_xxx`)                                             |
+| `VERCEL_PROJECT_ID`       | Vercel CLI deploys        | Vercel project ID (`prj_xxx`)                                               |
 
 ## Common Wrapper Examples
 
@@ -411,7 +414,7 @@ jobs:
    - Preview / dev / UAT branch pushes trigger automatic Vercel preview deployments (`exit 1` = proceed)
    - Production (`main`) pushes are skipped (`exit 0` = ignore), deployed by this workflow instead
 
-2. **Add required secrets** to your repository: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (find org and project IDs in `.vercel/project.json` or the Vercel dashboard), and `CI_GITHUB_TOKEN` (fine-grained PAT with Contents: Read and write).
+2. **Add required secrets** to your repository: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (find org and project IDs in `.vercel/project.json` or the Vercel dashboard), and `CI_GITHUB_TOKEN` (fine-grained PAT with Contents: Read and write) — see [docs/vercel-secrets-setup.md](docs/vercel-secrets-setup.md) for a step-by-step guide.
 
 3. **Remove any separate `release-version.yml`** workflow that triggers on `push` to `main` -- otherwise you will get duplicate releases.
 
