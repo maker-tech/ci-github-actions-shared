@@ -1,3 +1,10 @@
+## [1.4.7](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.6...v1.4.7) (2026-03-02)
+
+
+### Bug Fixes
+
+* **ci:** warn against secrets in extra_env; reorganize README ([#37](https://github.com/maker-tech/ci-github-actions-shared/issues/37)) ([18dd1cd](https://github.com/maker-tech/ci-github-actions-shared/commit/18dd1cd55516ea37cfe6f988bc6d4fa40e0c1cd5))
+
 ## [1.4.6](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.5...v1.4.6) (2026-03-02)
 
 
