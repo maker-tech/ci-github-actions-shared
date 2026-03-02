@@ -37,6 +37,10 @@ on:
       SLACK_WEBHOOK:
         description: 'Slack webhook for failure notifications (optional)'
         required: false
+    outputs:
+      merge_sha:
+        description: 'The merge commit SHA pushed to the target branch'
+        value: ${{ jobs.promote-to-branch.outputs.merge_sha }}
 
 permissions:
   contents: write
@@ -44,6 +48,9 @@ permissions:
 jobs:
   promote-to-branch:
     runs-on: ubuntu-latest
+
+    outputs:
+      merge_sha: ${{ steps.merge.outputs.merge_sha }}
 
     steps:
       - name: Checkout target branch
@@ -54,6 +61,7 @@ jobs:
           ref: ${{ inputs.target_branch }}
 
       - name: Merge ${{ inputs.source_branch }} into ${{ inputs.target_branch }} (always create merge commit)
+        id: merge
         shell: bash
         run: |
           set -euo pipefail
@@ -73,6 +81,8 @@ jobs:
 
           git merge --no-ff "origin/${{ inputs.source_branch }}" -m "$MSG"
           git push origin "${{ inputs.target_branch }}"
+
+          echo "merge_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Check Slack webhook availability
         id: slack
