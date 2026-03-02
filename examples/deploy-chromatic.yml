@@ -37,7 +37,11 @@ jobs:
       # chromatic_command: ''          # Custom Chromatic command (blank uses default: pnpm chromatic:ci)
       # extra_env: ''                 # Extra env vars as newline-separated KEY=VALUE pairs
       ## Example extra_env with Cloudinary:
+      ## IMPORTANT: extra_env is a workflow input (plain text) — values are visible in
+      ## logs and the Actions UI. Only use vars.* (public repository variables) here.
+      ## Never pass secrets via extra_env. If you need a secret in the build, add it as
+      ## a named secret on the shared workflow and pass it via the secrets: block below.
       # extra_env: |
-      #   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+      #   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ vars.CLOUDINARY_CLOUD_NAME }}
     secrets:
       CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }} # required
