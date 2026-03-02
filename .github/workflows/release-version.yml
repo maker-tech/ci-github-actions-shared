@@ -147,7 +147,7 @@ jobs:
           SLACK_COLOR: 'good'
           SLACK_ICON_EMOJI: ':fish:'
           SLACK_MESSAGE: ${{ steps.changelog.outputs.clean_changelog }}
-          SLACK_TITLE: 'Release ${{ steps.changelog.outputs.tag }} — ${{ github.repository }}'
+          SLACK_TITLE: 'Release: ${{ steps.changelog.outputs.tag }} — ${{ github.repository }}'
           SLACK_USERNAME: Github
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
@@ -157,7 +157,7 @@ jobs:
         env:
           SLACK_COLOR: 'warning'
           SLACK_ICON_EMOJI: ':warning:'
-          SLACK_MESSAGE: 'Release ${{ steps.changelog.outputs.tag }} in ${{ github.repository }} succeeded, but failed to merge into ${{ inputs.sync_branch }}. Please merge manually.'
+          SLACK_MESSAGE: 'Release: ${{ steps.changelog.outputs.tag }} in ${{ github.repository }} succeeded, but failed to merge into ${{ inputs.sync_branch }}. Please merge manually.'
           SLACK_TITLE: 'Manual Merge Required — ${{ github.repository }}'
           SLACK_USERNAME: Github
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
