@@ -70,19 +70,30 @@ jobs:
           path: ci-github-actions-shared
           token: ${{ github.token }}
 
+      - name: Resolve working directory
+        id: resolve-wd
+        shell: bash
+        run: |
+          wd="${{ inputs.working_directory }}"
+          if [[ "$wd" == "." || -z "$wd" ]]; then
+            echo "path=app" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=app/$wd" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Setup Node.js + install deps
         uses: ./ci-github-actions-shared/actions/setup-node
         with:
           package_manager: ${{ inputs.package_manager }}
           pnpm_version: ${{ inputs.pnpm_version }}
           node_version: ${{ inputs.node_version }}
-          working_directory: app/${{ inputs.working_directory }}
+          working_directory: ${{ steps.resolve-wd.outputs.path }}
           install_dependencies: 'true'
 
       - name: Lint
         if: inputs.run_lint
         shell: bash
-        working-directory: app/${{ inputs.working_directory }}
+        working-directory: ${{ steps.resolve-wd.outputs.path }}
         run: |
           set -euo pipefail
           if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
@@ -94,7 +105,7 @@ jobs:
       - name: Type check
         if: inputs.run_typecheck
         shell: bash
-        working-directory: app/${{ inputs.working_directory }}
+        working-directory: ${{ steps.resolve-wd.outputs.path }}
         run: |
           set -euo pipefail
           if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
@@ -106,7 +117,7 @@ jobs:
       - name: Test
         if: inputs.run_tests
         shell: bash
-        working-directory: app/${{ inputs.working_directory }}
+        working-directory: ${{ steps.resolve-wd.outputs.path }}
         run: |
           set -euo pipefail
           if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
