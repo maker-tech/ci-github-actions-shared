@@ -20,6 +20,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
     - [Chromatic on `uat`](#chromatic-on-uat)
     - [Promote `dev → uat` (manual)](#promote-dev--uat-manual)
     - [Release on `main` (and sync to `dev`)](#release-on-main-and-sync-to-dev)
+    - [Promote, Deploy \& Release (consolidated)](#promote-deploy--release-consolidated)
     - [E2E tests on `dev`](#e2e-tests-on-dev)
     - [Lint PR title](#lint-pr-title)
     - [Sync labels](#sync-labels)
@@ -204,6 +205,8 @@ jobs:
 ### Release on `main` (and sync to `dev`)
 
 > Full example: [`examples/release-version.yml`](examples/release-version.yml)
+>
+> **Tip:** If you need to verify that production deployment succeeds before creating a release, see [Promote, Deploy & Release (consolidated)](#promote-deploy--release-consolidated) instead.
 
 ```yaml
 name: Release Version
@@ -234,6 +237,55 @@ jobs:
       CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
+
+### Promote, Deploy & Release (consolidated)
+
+> Full example: [`examples/promote-deploy-release.yml`](examples/promote-deploy-release.yml)
+
+Use this pattern when you need to verify that production deployment succeeds **before** creating a release. It replaces the separate `promote-uat-to-main.yml` + `release-version.yml` (push-triggered) pair with a single workflow that gates the release on deployment success.
+
+```yaml
+name: Promote, Deploy & Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    name: 'Promote UAT to Main'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    with:
+      source_branch: uat
+      target_branch: main
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+
+  deploy:
+    name: 'Deploy to Production'
+    needs: promote
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.promote.outputs.merge_sha }}
+      - name: Deploy
+        run: echo "Add your deployment steps here"
+
+  release:
+    name: 'Create Release'
+    needs: deploy
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    with:
+      release_branch: main
+      sync_branch: dev
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+```
+
+> **Important:** When using this consolidated pattern, remove any separate `release-version.yml` workflow that triggers on `push` to `main` — otherwise you will get duplicate releases.
 
 ### E2E tests on `dev`
 
@@ -401,6 +453,12 @@ Merge one branch into another (always creates a merge commit). Common use: `dev 
 | ----------------- | -------- | --------------------------------------------------------------------------- |
 | `CI_GITHUB_TOKEN` | Yes      | Fine-grained PAT with **Contents: Read and write** on the target repository |
 | `SLACK_WEBHOOK`   | No       | Slack incoming webhook URL                                                  |
+
+**Outputs:**
+
+| Name        | Description                                        |
+| ----------- | -------------------------------------------------- |
+| `merge_sha` | The merge commit SHA pushed to the target branch   |
 
 ---
 
