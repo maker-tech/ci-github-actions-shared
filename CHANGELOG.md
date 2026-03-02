@@ -1,3 +1,10 @@
+## [1.4.6](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.5...v1.4.6) (2026-03-02)
+
+
+### Bug Fixes
+
+* **ci:** scope release branch guard to push events only ([#36](https://github.com/maker-tech/ci-github-actions-shared/issues/36)) ([851654f](https://github.com/maker-tech/ci-github-actions-shared/commit/851654f67730a48958a4cb331b59f9fbad117976))
+
 ## [1.4.5](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.4...v1.4.5) (2026-03-02)
 
 
