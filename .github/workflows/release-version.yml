@@ -147,7 +147,7 @@ jobs:
           SLACK_COLOR: 'good'
           SLACK_ICON_EMOJI: ':fish:'
           SLACK_MESSAGE: ${{ steps.changelog.outputs.clean_changelog }}
-          SLACK_TITLE: 'Release Version & Changelog — ${{ github.repository }}'
+          SLACK_TITLE: 'Release ${{ steps.changelog.outputs.tag }} — ${{ github.repository }}'
           SLACK_USERNAME: Github
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
