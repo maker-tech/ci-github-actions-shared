@@ -18,14 +18,10 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
     - [2. Create a Workflow File](#2-create-a-workflow-file)
     - [3. Configure Secrets](#3-configure-secrets)
   - [Common Wrapper Examples](#common-wrapper-examples)
-    - [Chromatic on `uat`](#chromatic-on-uat)
-    - [Promote `dev → uat` (manual)](#promote-dev--uat-manual)
-    - [Release on `main` (and sync to `dev`)](#release-on-main-and-sync-to-dev)
-    - [Release after Vercel auto-deployment](#release-after-vercel-auto-deployment)
-    - [Promote, Deploy \& Release (consolidated)](#promote-deploy--release-consolidated)
-    - [E2E tests on `dev`](#e2e-tests-on-dev)
-    - [Lint PR title](#lint-pr-title)
-    - [Sync labels](#sync-labels)
+    - [CI \& Quality](#ci--quality)
+    - [Branch Promotion](#branch-promotion)
+    - [Release \& Deployment](#release--deployment)
+    - [Repository Management](#repository-management)
   - [Workflow Reference](#workflow-reference)
     - [nextjs-ci.yml](#nextjs-ciyml)
     - [deploy-chromatic.yml](#deploy-chromaticyml)
@@ -98,11 +94,34 @@ Workflows prefixed with an underscore (`_`) are **internal to this repository** 
 
 ### 1. Choose Your Workflow
 
-Select the workflow that matches your deployment target.
+Select the workflow that matches your use case. See [Common Wrapper Examples](#common-wrapper-examples) for copy-paste workflows organised by category.
 
 ### 2. Create a Workflow File
 
-Create `.github/workflows/ci.yml` in your repository:
+Create a `.github/workflows/` file in your repository. Here's a typical example — one-click promotion of `dev` into `uat`:
+
+**Example: Promote Dev to UAT** (full example: [`examples/promote-dev-to-uat.yml`](examples/promote-dev-to-uat.yml))
+
+```yaml
+name: Promote dev to uat
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    name: 'Promote Dev to UAT'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    with:
+      source_branch: dev
+      target_branch: uat
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+```
 
 **Example: CI Only** (full example: [`examples/nextjs-ci.yml`](examples/nextjs-ci.yml))
 
@@ -147,9 +166,36 @@ Add the required secrets to your repository:
 
 ## Common Wrapper Examples
 
-Reusable workflows don’t define triggers for your repo. Add a thin wrapper workflow in your repo with the triggers you want.
+Reusable workflows don't define triggers for your repo. Add a thin wrapper workflow in your repo with the triggers you want. See [Workflow Reference](#workflow-reference) for all available inputs and secrets.
 
-### Chromatic on `uat`
+### CI & Quality
+
+Workflows for linting, testing, and visual review. These typically run on every push or pull request.
+
+#### Lint PR title
+
+> Full example: [`examples/lint-pr-title.yml`](examples/lint-pr-title.yml)
+
+```yaml
+name: Lint PR title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  lint:
+    name: 'Lint PR Title'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+    ## Defaults (uncomment to override)
+    # with:
+    #   preset: conventionalcommits  #options: conventionalcommits,eslint
+```
+
+#### Chromatic on `uat`
 
 > Full example: [`examples/deploy-chromatic.yml`](examples/deploy-chromatic.yml)
 
@@ -177,15 +223,51 @@ jobs:
       CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 ```
 
-### Promote `dev → uat` (manual)
+#### E2E tests on `dev`
 
-> Full example: [`examples/promote-dev-to-uat.yml`](examples/promote-dev-to-uat.yml) | [`examples/promote-uat-to-main.yml`](examples/promote-uat-to-main.yml)
+> Full example: [`examples/e2e-test.yml`](examples/e2e-test.yml)
+
+```yaml
+name: E2E tests DEV
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: 'E2E Tests'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
+    with:
+      target_url: https://dev.levande.com.au
+      ## Defaults (uncomment to override)
+      # playwright_version: '1.55.1'
+      # axe_core_version: '4.11.0'
+      # node_version: '22'
+      # test_browser: chromium  #options: chromium,firefox,webkit
+      # shard_total: 4
+      # artifact_retention_days: 30
+      # fail_screenshots_path: 'tests/functional/screenshots/**'
+    secrets:
+      BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
+      BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+```
+
+### Branch Promotion
+
+Manual workflows for merging one branch into another via merge commit. Use these to control when code moves between environments.
+
+#### Promote `dev → uat`
+
+> Full example: [`examples/promote-dev-to-uat.yml`](examples/promote-dev-to-uat.yml)
 
 ```yaml
 name: Promote dev to uat
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -204,7 +286,36 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
-### Release on `main` (and sync to `dev`)
+#### Promote `uat → main`
+
+> Full example: [`examples/promote-uat-to-main.yml`](examples/promote-uat-to-main.yml)
+
+```yaml
+name: Promote uat to main
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    name: 'Promote UAT to Main'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    with:
+      source_branch: uat
+      target_branch: main
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+```
+
+### Release & Deployment
+
+Workflows for creating releases and managing deployments. Choose the pattern that matches your deployment strategy.
+
+#### Release on `main` (and sync to `dev`)
 
 > Full example: [`examples/release-version.yml`](examples/release-version.yml)
 >
@@ -243,7 +354,7 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
-### Release after Vercel auto-deployment
+#### Release after Vercel auto-deployment
 
 > Full example: [`examples/release-on-vercel-auto-deployment.yml`](examples/release-on-vercel-auto-deployment.yml)
 
@@ -277,7 +388,7 @@ jobs:
 >
 > When using this pattern, remove any separate `release-version.yml` workflow that triggers on `push` to `main` -- otherwise you will get duplicate releases.
 
-### Promote, Deploy & Release (consolidated)
+#### Promote, Deploy & Release (consolidated)
 
 > Full example: [`examples/promote-deploy-release.yml`](examples/promote-deploy-release.yml)
 
@@ -326,62 +437,11 @@ jobs:
 
 > **Important:** When using this consolidated pattern, remove any separate `release-version.yml` workflow that triggers on `push` to `main` — otherwise you will get duplicate releases.
 
-### E2E tests on `dev`
+### Repository Management
 
-> Full example: [`examples/e2e-test.yml`](examples/e2e-test.yml)
+Utility workflows for repository housekeeping.
 
-```yaml
-name: E2E tests DEV
-
-on:
-  push:
-    branches: [dev]
-  workflow_dispatch:
-
-jobs:
-  e2e:
-    name: 'E2E Tests'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
-    with:
-      target_url: https://dev.levande.com.au
-      ## Defaults (uncomment to override)
-      # playwright_version: '1.55.1'
-      # axe_core_version: '4.11.0'
-      # node_version: '22'
-      # test_browser: chromium  #options: chromium,firefox,webkit
-      # shard_total: 4
-      # artifact_retention_days: 30
-      # fail_screenshots_path: 'tests/functional/screenshots/**'
-    secrets:
-      BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
-      BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
-      SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
-```
-
-### Lint PR title
-
-> Full example: [`examples/lint-pr-title.yml`](examples/lint-pr-title.yml)
-
-```yaml
-name: Lint PR title
-
-on:
-  pull_request:
-    types: [opened, edited, synchronize, reopened]
-
-permissions:
-  pull-requests: read
-
-jobs:
-  lint:
-    name: 'Lint PR Title'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
-    ## Defaults (uncomment to override)
-    # with:
-    #   preset: conventionalcommits  #options: conventionalcommits,eslint
-```
-
-### Sync labels
+#### Sync labels
 
 > Full example: [`examples/repo-sync-labels.yml`](examples/repo-sync-labels.yml)
 
