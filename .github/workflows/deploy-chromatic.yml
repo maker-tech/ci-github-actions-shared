@@ -10,9 +10,13 @@
 #         pnpm_version: 10.28.2
 #         working_directory: .
 #         # ci_ref: main  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)
-#         # Optional: pass extra environment variables as KEY=VALUE lines
+#         # Optional: pass extra environment variables as KEY=VALUE lines.
+#         # IMPORTANT: extra_env is a workflow input (plain text) — values are visible
+#         # in logs and the Actions UI. Only use vars.* (public repository variables).
+#         # Never pass secrets via extra_env. If you need a secret in the build, add it
+#         # as a named secret on this workflow and pass it via the secrets: block.
 #         extra_env: |
-#           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+#           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ vars.CLOUDINARY_CLOUD_NAME }}
 #       secrets:
 #         CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 #
