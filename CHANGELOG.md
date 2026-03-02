@@ -1,3 +1,10 @@
+## [1.4.9](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.8...v1.4.9) (2026-03-02)
+
+
+### Bug Fixes
+
+* **ci:** use deployed commit SHA for skip_automated_commits guard ([#39](https://github.com/maker-tech/ci-github-actions-shared/issues/39)) ([dd350b1](https://github.com/maker-tech/ci-github-actions-shared/commit/dd350b1e6ccc8b2eee91792d9a3f01a045dd79ed))
+
 ## [1.4.8](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.7...v1.4.8) (2026-03-02)
 
 
