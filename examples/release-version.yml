@@ -6,6 +6,10 @@
 # Triggers: push to main (excluding package.json and CHANGELOG.md to prevent loops)
 # Required secrets: CI_GITHUB_TOKEN (fine-grained PAT with Contents: Read and write)
 # Permissions: contents: write
+#
+# NOTE: This push-triggered pattern creates a release as soon as code lands on main,
+# without verifying deployment. If you need to gate the release on a successful
+# deployment, use the consolidated pattern instead: examples/promote-deploy-release.yml
 
 name: Release Version
 

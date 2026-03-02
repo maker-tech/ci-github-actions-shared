@@ -1,0 +1,78 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Promote, Deploy & Release (consolidated) -- Single workflow that promotes uat
+# to main, deploys to production, and creates a release only after deployment
+# succeeds. This prevents phantom releases for failed deployments.
+#
+# Flow: promote (shared) → deploy (your steps) → release (shared)
+#
+# Calls:
+#   - maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml
+#   - maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml
+#
+# Triggers: manual dispatch only
+# Required secrets: CI_GITHUB_TOKEN (fine-grained PAT with Contents: Read and write)
+# Permissions: contents: write
+#
+# IMPORTANT: When using this consolidated pattern, remove any separate
+# release-version.yml workflow that triggers on push to main — otherwise
+# you will get duplicate releases.
+
+name: Promote, Deploy & Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    name: 'Promote UAT to Main'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    with:
+      source_branch: uat   # required -- branch to merge from
+      target_branch: main  # required -- branch to merge into
+      ## Optional (uncomment to override defaults)
+      # merge_message: ''  # Custom merge commit message (blank uses default)
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }} # required -- admin token to push to protected branches
+      ## Optional secrets (uncomment if needed)
+      # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }} # Slack webhook for failure notifications
+
+  deploy:
+    name: 'Deploy to Production'
+    needs: promote
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.promote.outputs.merge_sha }}
+
+      # ---------------------------------------------------------------
+      # Replace the placeholder step below with your deployment steps.
+      #
+      # Examples:
+      #   Vercel:  npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
+      #   AWS:     aws s3 sync ./out s3://my-bucket --delete
+      #   GCP:     gcloud run deploy my-service --image=...
+      # ---------------------------------------------------------------
+      - name: Deploy
+        run: echo "Add your deployment steps here"
+
+  release:
+    name: 'Create Release'
+    needs: deploy
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    with:
+      release_branch: main # required -- branch where releases are created
+      sync_branch: dev     # required -- branch to sync after release (set to '' to disable)
+      ## Optional (uncomment to override defaults)
+      # preset: conventionalcommits  # Changelog preset -- options: conventionalcommits, eslint
+      # output_file: CHANGELOG.md    # Changelog output file
+      # skip_on_empty: false         # Skip release if no conventional commits found
+      # release_count: 5             # Releases to keep in changelog (0 = all)
+    secrets:
+      CI_GITHUB_TOKEN: ${{ secrets.CI_GITHUB_TOKEN }} # required -- admin token for protected branches and releases
+      ## Optional secrets (uncomment if needed)
+      # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }} # Slack webhook for release/failure notifications
