@@ -9,8 +9,8 @@
 #
 # NOTE: This push-triggered pattern creates a release as soon as code lands on main,
 # without verifying deployment. To release only after successful deployment, use:
-#   - examples/release-on-vercel-auto-deployment.yml (Vercel/Netlify native auto-deploy)
-#   - examples/promote-deploy-release.yml (deploy via GitHub Actions: Vercel CLI, AWS, GCP)
+#   - examples/deploy-vercel-cli-release.yml (deploy to Vercel via CLI, then release)
+#   - examples/promote-deploy-release.yml (deploy via GitHub Actions: AWS, GCP, or manual dispatch)
 
 name: Release Version
 

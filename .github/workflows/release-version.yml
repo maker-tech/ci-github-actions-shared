@@ -48,10 +48,6 @@ on:
         description: 'Number of releases to preserve in the changelog (0 = keep all, default: 5)'
         type: number
         default: 5
-      skip_automated_commits:
-        description: 'Skip release if the deployed commit was from github-actions[bot] (use with deployment_status triggers to prevent loops; falls back to branch HEAD for non-deployment triggers)'
-        type: boolean
-        default: false
     secrets:
       CI_GITHUB_TOKEN:
         description: 'Admin token for protected branches and creating releases'
@@ -87,26 +83,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.release_branch }}
 
-      - name: Check for automated commit
-        if: ${{ inputs.skip_automated_commits }}
-        id: guard
-        shell: bash
-        run: |
-          DEPLOY_SHA="${{ github.event.deployment.sha }}"
-          if [[ -n "$DEPLOY_SHA" ]]; then
-            AUTHOR=$(git log -1 --format='%an' "$DEPLOY_SHA")
-            echo "Deployed SHA: $DEPLOY_SHA (author: $AUTHOR)"
-          else
-            AUTHOR=$(git log -1 --format='%an')
-            echo "No deployment SHA available — checking branch HEAD (author: $AUTHOR)"
-          fi
-          if [[ "$AUTHOR" == "github-actions[bot]" ]]; then
-            echo "Release skipped — commit was automated (version bump)"
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Conventional Changelog Action
-        if: ${{ steps.guard.outputs.skip != 'true' }}
         id: changelog
         uses: TriPSs/conventional-changelog-action@1abec007de15e5b2b14cce780f02245e4722e862
         with:
@@ -118,7 +95,7 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@e798e6a1ede8d07b74ac4cdac6bdfa4cc1653907
-        if: ${{ steps.guard.outputs.skip != 'true' && steps.changelog.outputs.skipped == 'false' }}
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
         with:
           tag_name: ${{ steps.changelog.outputs.tag }}
           name: Release ${{ steps.changelog.outputs.tag }}
@@ -126,7 +103,7 @@ jobs:
 
       - name: Merge ${{ inputs.release_branch }} into ${{ inputs.sync_branch }} (always create merge commit)
         id: merge_to_sync
-        if: ${{ steps.guard.outputs.skip != 'true' && steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' }}
+        if: ${{ steps.changelog.outputs.skipped == 'false' && inputs.sync_branch != '' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -144,7 +121,7 @@ jobs:
 
       - name: Determine Slack notifications
         id: slack
-        if: ${{ steps.guard.outputs.skip != 'true' && steps.changelog.outputs.skipped == 'false' }}
+        if: ${{ steps.changelog.outputs.skipped == 'false' }}
         shell: bash
         run: |
           if [[ "${{ secrets.SLACK_WEBHOOK }}" == '' ]]; then

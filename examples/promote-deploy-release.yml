@@ -18,9 +18,9 @@
 # release-version.yml workflow that triggers on push to main — otherwise
 # you will get duplicate releases.
 #
-# TIP: If your platform auto-deploys on push (e.g. Vercel native integration),
-# use examples/release-on-vercel-auto-deployment.yml instead — it's simpler
-# and doesn't require deploying via GitHub Actions.
+# TIP: For Vercel deployments, consider examples/deploy-vercel-cli-release.yml
+# instead — it deploys via the Vercel CLI on push to main and is simpler when
+# you don't need the promote step.
 
 name: Promote, Deploy & Release
 

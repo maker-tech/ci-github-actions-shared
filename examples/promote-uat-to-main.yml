@@ -8,8 +8,8 @@
 # Permissions: contents: write
 #
 # NOTE: If you need to verify deployment before creating a release, consider:
-#   - examples/release-on-vercel-auto-deployment.yml (Vercel/Netlify native auto-deploy)
-#   - examples/promote-deploy-release.yml (deploy via GitHub Actions: Vercel CLI, AWS, GCP)
+#   - examples/deploy-vercel-cli-release.yml (deploy to Vercel via CLI, then release)
+#   - examples/promote-deploy-release.yml (deploy via GitHub Actions: AWS, GCP, or manual dispatch)
 
 name: Promote UAT to MAIN
 
