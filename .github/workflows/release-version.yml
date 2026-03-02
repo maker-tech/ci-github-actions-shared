@@ -74,7 +74,7 @@ jobs:
 
     steps:
       - name: Ensure correct branch
-        if: ${{ github.ref_name != inputs.release_branch }}
+        if: ${{ github.event_name == 'push' && github.ref_name != inputs.release_branch }}
         shell: bash
         run: |
           echo "This workflow is intended to run from '${{ inputs.release_branch }}' (current: '${{ github.ref_name }}')."
