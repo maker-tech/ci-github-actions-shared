@@ -1,3 +1,10 @@
+## [1.4.8](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.7...v1.4.8) (2026-03-02)
+
+
+### Bug Fixes
+
+* **ci:** resolve working_directory before use to prevent invalid cache path ([#38](https://github.com/maker-tech/ci-github-actions-shared/issues/38)) ([8c2ba3f](https://github.com/maker-tech/ci-github-actions-shared/commit/8c2ba3f675f1dbd71975ea506a5acc96eadee4d3))
+
 ## [1.4.7](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.6...v1.4.7) (2026-03-02)
 
 
