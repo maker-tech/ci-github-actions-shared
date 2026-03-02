@@ -7,8 +7,9 @@
 # Required secrets: CI_GITHUB_TOKEN (fine-grained PAT with Contents: Read and write)
 # Permissions: contents: write
 #
-# NOTE: If you need to verify deployment before creating a release, consider
-# using the consolidated pattern instead: examples/promote-deploy-release.yml
+# NOTE: If you need to verify deployment before creating a release, consider:
+#   - examples/release-on-vercel-auto-deployment.yml (Vercel/Netlify native auto-deploy)
+#   - examples/promote-deploy-release.yml (deploy via GitHub Actions: Vercel CLI, AWS, GCP)
 
 name: Promote UAT to MAIN
 
