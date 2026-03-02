@@ -1,3 +1,23 @@
+## [2.0.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.9...v2.0.0) (2026-03-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* removes skip_automated_commits input from
+release-version.yml. Consumers passing skip_automated_commits: true
+must switch to the new deploy-vercel-cli-release.yml pattern.
+
+- Delete examples/release-on-vercel-auto-deployment.yml
+- Remove skip_automated_commits input and guard step from release-version.yml
+- Add examples/deploy-vercel-cli-release.yml with vercel.json ignoreCommand
+  setup docs for skipping production auto-deploys
+- Update README with new Deploy via Vercel CLI + Release section and setup
+  checklist including vercel.json snippet
+- Update cross-references in promote-deploy-release.yml,
+  promote-uat-to-main.yml, and release-version.yml examples
+
+* feat!(ci): replace deployment_status pattern with Vercel CLI deploy + release (#40) ([8690cbf](https://github.com/maker-tech/ci-github-actions-shared/commit/8690cbff3fa8c6888825c6004938330a6c77e070)), closes [#40](https://github.com/maker-tech/ci-github-actions-shared/issues/40)
+
 ## [1.4.9](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.8...v1.4.9) (2026-03-02)
 
 
