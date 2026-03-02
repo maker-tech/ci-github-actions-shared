@@ -49,7 +49,7 @@ on:
         type: number
         default: 5
       skip_automated_commits:
-        description: 'Skip release if the latest commit was from github-actions[bot] (use with deployment_status triggers to prevent loops)'
+        description: 'Skip release if the deployed commit was from github-actions[bot] (use with deployment_status triggers to prevent loops; falls back to branch HEAD for non-deployment triggers)'
         type: boolean
         default: false
     secrets:
@@ -92,9 +92,16 @@ jobs:
         id: guard
         shell: bash
         run: |
-          AUTHOR=$(git log -1 --format='%an')
+          DEPLOY_SHA="${{ github.event.deployment.sha }}"
+          if [[ -n "$DEPLOY_SHA" ]]; then
+            AUTHOR=$(git log -1 --format='%an' "$DEPLOY_SHA")
+            echo "Deployed SHA: $DEPLOY_SHA (author: $AUTHOR)"
+          else
+            AUTHOR=$(git log -1 --format='%an')
+            echo "No deployment SHA available — checking branch HEAD (author: $AUTHOR)"
+          fi
           if [[ "$AUTHOR" == "github-actions[bot]" ]]; then
-            echo "Release skipped — last commit was automated (version bump)"
+            echo "Release skipped — commit was automated (version bump)"
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
