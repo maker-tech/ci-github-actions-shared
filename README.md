@@ -1,7 +1,7 @@
 # CI Client Workflows (ci-github-actions-shared)
 
-> [!NOTE] We do not accept PRs from external users.
-> .
+> [!NOTE]
+> We do not accept PRs from external users.
 
 Standardised, reusable GitHub Actions workflows for building and deploying Next.js applications.
 
