@@ -88,6 +88,7 @@ jobs:
         uses: TriPSs/conventional-changelog-action@1abec007de15e5b2b14cce780f02245e4722e862
         with:
           github-token: ${{ secrets.CI_GITHUB_TOKEN }}
+          git-branch: ${{ inputs.release_branch }}
           preset: ${{ inputs.preset }}
           output-file: ${{ inputs.output_file }}
           skip-on-empty: ${{ inputs.skip_on_empty }}
