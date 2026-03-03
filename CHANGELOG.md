@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.0...v2.0.1) (2026-03-03)
+
+
+### Bug Fixes
+
+* **ci:** pin conventional-changelog-action to release_branch ([#42](https://github.com/maker-tech/ci-github-actions-shared/issues/42)) ([794a482](https://github.com/maker-tech/ci-github-actions-shared/commit/794a48286c1fed84c0b043859aed156b1c47d123))
+
 ## [2.0.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v1.4.9...v2.0.0) (2026-03-02)
 
 
