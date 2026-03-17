@@ -57,13 +57,13 @@ jobs:
 
     steps:
       - name: Checkout app repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@v4.3.0
         with:
           path: app
           ref: ${{ github.sha }}
 
       - name: Checkout ci-github-actions-shared repo (for local composite actions)
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@v4.3.0
         with:
           repository: maker-tech/ci-github-actions-shared
           ref: ${{ inputs.ci_ref }}

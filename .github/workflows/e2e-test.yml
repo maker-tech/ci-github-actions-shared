@@ -92,10 +92,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        uses: actions/checkout@v4.3.0
 
       - name: Use Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238
         with:
           node-version: ${{ inputs.node_version }}
           package-manager-cache: false # Disable package manager cache to avoid conflicts with pnpm
@@ -134,7 +134,7 @@ jobs:
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ inputs.shard_total }}
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         if: ${{ always() }}
         with:
           name: playwright-report-shard-${{ matrix.shardIndex }}
@@ -142,7 +142,7 @@ jobs:
           retention-days: ${{ inputs.artifact_retention_days }}
 
       - name: Upload failure screenshots
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         if: ${{ failure() }}
         with:
           name: e2e-fail-screenshots-shard-${{ matrix.shardIndex }}
