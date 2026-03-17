@@ -32,13 +32,13 @@ jobs:
     steps:
       - name: Validate
         if: inputs.preset != 'eslint'
-        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
       - name: Validate (eslint preset)
         if: inputs.preset == 'eslint'
-        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50
         with:
           types: |
             fix
