@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.3...v2.0.4) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** update stale checkout reference in README ([#48](https://github.com/maker-tech/ci-github-actions-shared/issues/48)) ([4e695e4](https://github.com/maker-tech/ci-github-actions-shared/commit/4e695e4b8b3ddc851d871237fcecee797aa0f882))
+
 ## [2.0.3](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.2...v2.0.3) (2026-03-18)
 
 
