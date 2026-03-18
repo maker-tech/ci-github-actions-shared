@@ -651,7 +651,7 @@ These actions can be used directly in your workflows for more granular control:
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v6
 
   - uses: maker-tech/ci-github-actions-shared/actions/setup-node@v1
     with:
