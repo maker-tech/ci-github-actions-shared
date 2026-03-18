@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.2...v2.0.3) (2026-03-18)
+
+
+### Bug Fixes
+
+* **ci:** update actions/checkout to v6.0.2 ([#47](https://github.com/maker-tech/ci-github-actions-shared/issues/47)) ([b316ef9](https://github.com/maker-tech/ci-github-actions-shared/commit/b316ef9e874bb8c3a7ee3a79c7ef5d1e9c6ba5c0))
+
 ## [2.0.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.1...v2.0.2) (2026-03-18)
 
 
