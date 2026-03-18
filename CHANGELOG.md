@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.1...v2.0.2) (2026-03-18)
+
+
+### Reverts
+
+* **ci:** downgrade actions/checkout from v4.3.0 to v4.2.2 ([#45](https://github.com/maker-tech/ci-github-actions-shared/issues/45)) ([379845c](https://github.com/maker-tech/ci-github-actions-shared/commit/379845c6a8910616f8c29d6d933c5e696320e189))
+
 ## [2.0.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.0...v2.0.1) (2026-03-03)
 
 
