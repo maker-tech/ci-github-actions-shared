@@ -732,11 +732,29 @@ This repo provides a **shareable Renovate preset** for consumer repositories. Us
 		"github>maker-tech/ci-github-actions-shared:renovate-preset"
 	],
 	"timezone": "Pacific/Auckland",
-	"schedule": ["before 6am on monday"]
+	"schedule": ["before 8am every weekday"],
+	"automergeSchedule": ["before 8am every weekday"]
 }
 ```
 
 That's it. The preset handles everything else.
+
+#### Optional: enable Renovate automerge in the consuming repository
+
+If you want Renovate to automatically merge **patch** and/or **minor** updates in the external project while still requiring human reviews for non-Renovate PRs, apply that setup in the **consumer repository**, not in this shared-workflows repo.
+
+Use [docs/branch-protection-and-automerge.md](docs/branch-protection-and-automerge.md) for the full step-by-step process. In short:
+
+- Put your human review requirement in one ruleset and add Renovate to the bypass list there.
+- Put your required CI checks in a separate ruleset and do **not** let Renovate bypass those checks.
+- Keep `platformAutomerge: false` in the consuming repo so Renovate merges via its own token instead of GitHub native auto-merge.
+
+This gives you the split you usually want:
+
+- Renovate patch/minor PRs can merge automatically after required checks pass.
+- Human PRs still need normal reviewer approval before they can merge.
+
+The guide uses `dev` as the protected branch in its examples, but the same pattern applies to whichever long-lived branch in the consuming repo receives Renovate PRs.
 
 **What the preset includes:**
 
@@ -765,7 +783,8 @@ If your project uses additional packages that should get individual PRs (e.g. `@
 		"github>maker-tech/ci-github-actions-shared:renovate-preset"
 	],
 	"timezone": "Pacific/Auckland",
-	"schedule": ["before 6am on monday"],
+	"schedule": ["before 8am every weekday"],
+	"automergeSchedule": ["before 8am every weekday"],
 	"packageRules": [
 		{
 			"description": "Project-specific critical packages",
