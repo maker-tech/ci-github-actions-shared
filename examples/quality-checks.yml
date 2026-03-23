@@ -1,0 +1,75 @@
+# Copy this file to your repository's .github/workflows/ directory.
+#
+# Quality Checks with CI Gate -- Lint and typecheck with a gate job for required status checks
+# Calls: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml
+#
+# This is the recommended default for protected branches that use REQUIRED
+# STATUS CHECKS (e.g. branch protection rulesets or Renovate automerge). The
+# paths-ignore trigger in nextjs-ci.yml causes a deadlock: if all changed files
+# match the ignore list, the workflow never fires, the required check never
+# appears, and the PR is blocked forever.
+#
+# This workflow always fires on every PR. It detects whether source files
+# changed, conditionally runs CI, and reports a consistent "CI Gate" check name
+# that a ruleset can safely require.
+#
+# See docs/branch-protection-and-automerge.md for the full branch protection
+# and Renovate automerge setup guide.
+#
+# Triggers: pull requests (all), workflow_dispatch
+# Required secrets: none
+# Permissions: pull-requests: read
+
+name: Quality Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  changes:
+    name: 'Detect changes'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      should_run: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: filter
+        with:
+          predicate-quantifier: 'every'
+          filters: |
+            src:
+              - '**'
+              - '!.github/**'
+              - '!.husky/**'
+              - '!.cursor/**'
+              - '!docs/**'
+              - '!**/*.md'
+
+  checks:
+    name: 'CI'
+    needs: changes
+    if: needs.changes.outputs.should_run == 'true'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2
+    with:
+      package_manager: pnpm # required -- options: pnpm, npm
+      ## Optional (uncomment to override defaults)
+      # pnpm_version: '10.28.2'
+      # node_version: '22.12.0'
+      # working_directory: '.'
+      # run_lint: true
+      # run_typecheck: true
+      # run_tests: false
+
+  ci-gate:
+    name: 'CI Gate'
+    if: ${{ !cancelled() }}
+    needs: [changes, checks]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ "${{ needs.checks.result }}" == "failure" || "${{ needs.checks.result }}" == "cancelled" ]]; then
+            exit 1
+          fi
