@@ -3,6 +3,15 @@
 # Next.js CI -- Lint, typecheck, and test
 # Calls: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml
 #
+# This is the lightweight option for branches that do NOT use required status
+# checks. For protected branches, required checks, or Renovate automerge, use
+# quality-checks.yml instead.
+#
+# WARNING: This workflow uses paths-ignore, which is INCOMPATIBLE with required
+# status checks (branch protection rulesets). If all changed files match the
+# ignore list, the workflow never fires and the required check deadlocks the PR.
+# Use quality-checks.yml instead when your branch has required status checks.
+#
 # Triggers: pull requests (excluding docs/config changes)
 # Required secrets: none
 # Permissions: contents: read (default)
@@ -23,7 +32,7 @@ on:
 jobs:
   ci:
     name: 'CI'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2
     with:
       package_manager: pnpm # required -- options: pnpm, npm
       ## Optional (uncomment to override defaults)
