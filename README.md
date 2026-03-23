@@ -19,9 +19,19 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
     - [3. Configure Secrets](#3-configure-secrets)
   - [Common Wrapper Examples](#common-wrapper-examples)
     - [CI \& Quality](#ci--quality)
+      - [Lint PR title](#lint-pr-title)
+      - [Quality Checks with CI Gate](#quality-checks-with-ci-gate)
+      - [Chromatic on `uat`](#chromatic-on-uat)
+      - [E2E tests on `dev`](#e2e-tests-on-dev)
     - [Branch Promotion](#branch-promotion)
+      - [Promote `dev → uat`](#promote-dev--uat)
+      - [Promote `uat → main`](#promote-uat--main)
     - [Release \& Deployment](#release--deployment)
+      - [Release on `main` (and sync to `dev`)](#release-on-main-and-sync-to-dev)
+      - [Deploy via Vercel CLI + Release](#deploy-via-vercel-cli--release)
+      - [Promote, Deploy \& Release (consolidated)](#promote-deploy--release-consolidated)
     - [Repository Management](#repository-management)
+      - [Sync labels](#sync-labels)
   - [Workflow Reference](#workflow-reference)
     - [nextjs-ci.yml](#nextjs-ciyml)
     - [deploy-chromatic.yml](#deploy-chromaticyml)
@@ -35,6 +45,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
   - [Security Model](#security-model)
   - [Versioning \& Updates](#versioning--updates)
     - [Automated Updates with Renovate](#automated-updates-with-renovate)
+      - [Optional: enable Renovate automerge in the consuming repository](#optional-enable-renovate-automerge-in-the-consuming-repository)
   - [What These Workflows Will NOT Do](#what-these-workflows-will-not-do)
   - [Contributing — Workflow Authoring Rules](#contributing--workflow-authoring-rules)
     - [Do not use `secrets.*` in step-level `if` conditions](#do-not-use-secrets-in-step-level-if-conditions)
@@ -123,32 +134,66 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
-**Example: CI Only** (full example: [`examples/nextjs-ci.yml`](examples/nextjs-ci.yml))
+**Example: Protected Branch CI (recommended)** (full example: [`examples/quality-checks.yml`](examples/quality-checks.yml))
 
 ```yaml
-name: CI
+name: Quality Checks
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
   pull_request:
 
 jobs:
-  ci:
+  changes:
+    name: 'Detect changes'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      should_run: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: filter
+        with:
+          predicate-quantifier: 'every'
+          filters: |
+            src:
+              - '**'
+              - '!.github/**'
+              - '!.husky/**'
+              - '!.cursor/**'
+              - '!docs/**'
+              - '!**/*.md'
+
+  checks:
     name: 'CI'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
+    needs: changes
+    if: needs.changes.outputs.should_run == 'true'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2
     with:
       package_manager: pnpm
       ## Defaults (uncomment to override)
       # pnpm_version: '10.28.2'
       # node_version: '22.12.0'
-      # working_directory: '.'
       # run_lint: true
-      # run_tests: true
       # run_typecheck: true
+      # run_tests: false
+
+  ci-gate:
+    name: 'CI Gate'
+    if: ${{ !cancelled() }}
+    needs: [changes, checks]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ "${{ needs.checks.result }}" == "failure" || "${{ needs.checks.result }}" == "cancelled" ]]; then
+            exit 1
+          fi
 ```
 
-> **Important:** Always reference a version tag (e.g., `@v1`). Never use `@main`.
+> **Recommended default:** Use [`examples/quality-checks.yml`](examples/quality-checks.yml) for protected branches, required status checks, and Renovate automerge. Only use the lighter [`examples/nextjs-ci.yml`](examples/nextjs-ci.yml) pattern when the branch does **not** require checks.
+>
+> **Important:** Always reference a version tag (e.g., `@v2`). Never use `@main`.
 
 ### 3. Configure Secrets
 
@@ -173,7 +218,7 @@ Reusable workflows don't define triggers for your repo. Add a thin wrapper workf
 
 ### CI & Quality
 
-Workflows for linting, testing, and visual review. These typically run on every push or pull request.
+Workflows for linting, testing, and visual review. These typically run on every push or pull request. For protected branches, start with **Quality Checks with CI Gate** below.
 
 #### Lint PR title
 
@@ -197,6 +242,71 @@ jobs:
     # with:
     #   preset: conventionalcommits  #options: conventionalcommits,eslint
 ```
+
+#### Quality Checks with CI Gate
+
+> Full example: [`examples/quality-checks.yml`](examples/quality-checks.yml) | Setup guide: [`docs/branch-protection-and-automerge.md`](docs/branch-protection-and-automerge.md)
+
+Use this as the default pattern when your branch has **required status checks** (for example, branch protection rulesets or Renovate automerge on a protected branch). The `paths-ignore` trigger in `nextjs-ci.yml` causes a deadlock: if every changed file matches the ignore list the workflow never fires, the required check never appears, and the PR is blocked forever.
+
+This workflow always fires on every PR. It detects whether source files changed, conditionally runs CI, and reports a consistent `CI Gate` check name that a ruleset can safely require.
+
+```yaml
+name: Quality Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  changes:
+    name: 'Detect changes'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      should_run: ${{ steps.filter.outputs.src }}
+    steps:
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: filter
+        with:
+          predicate-quantifier: 'every'
+          filters: |
+            src:
+              - '**'
+              - '!.github/**'
+              - '!.husky/**'
+              - '!.cursor/**'
+              - '!docs/**'
+              - '!**/*.md'
+
+  checks:
+    name: 'CI'
+    needs: changes
+    if: needs.changes.outputs.should_run == 'true'
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2
+    with:
+      package_manager: pnpm
+      ## Optional (uncomment to override defaults)
+      # pnpm_version: '10.28.2'
+      # node_version: '22.12.0'
+      # run_lint: true
+      # run_typecheck: true
+      # run_tests: false
+
+  ci-gate:
+    name: 'CI Gate'
+    if: ${{ !cancelled() }}
+    needs: [changes, checks]
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          if [[ "${{ needs.checks.result }}" == "failure" || "${{ needs.checks.result }}" == "cancelled" ]]; then
+            exit 1
+          fi
+```
+
+> **When to use which:** For protected branches, required checks, or Renovate automerge, use [`examples/quality-checks.yml`](examples/quality-checks.yml). Use the simpler [`examples/nextjs-ci.yml`](examples/nextjs-ci.yml) only for lightweight branches that do **not** require status checks.
 
 #### Chromatic on `uat`
 
@@ -407,7 +517,7 @@ jobs:
 
    ```json
    {
-     "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then exit 0; else exit 1; fi"
+   	"ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then exit 0; else exit 1; fi"
    }
    ```
 
@@ -597,14 +707,14 @@ Create a conventional changelog + bump version + create GitHub release, then opt
 
 **Inputs:**
 
-| Name                     | Required | Default               | Description                                     |
-| ------------------------ | -------- | --------------------- | ----------------------------------------------- |
-| `release_branch`         | No       | `main`                | Branch where releases are created               |
-| `sync_branch`            | No       | `dev`                 | Branch to sync after release                    |
-| `preset`                 | No       | `conventionalcommits` | Changelog preset                                |
-| `output_file`            | No       | `CHANGELOG.md`        | Changelog file path                             |
-| `skip_on_empty`          | No       | `false`               | Skip release if no changes                      |
-| `release_count`          | No       | `5`                   | Releases to keep in changelog (0 = all)         |
+| Name             | Required | Default               | Description                             |
+| ---------------- | -------- | --------------------- | --------------------------------------- |
+| `release_branch` | No       | `main`                | Branch where releases are created       |
+| `sync_branch`    | No       | `dev`                 | Branch to sync after release            |
+| `preset`         | No       | `conventionalcommits` | Changelog preset                        |
+| `output_file`    | No       | `CHANGELOG.md`        | Changelog file path                     |
+| `skip_on_empty`  | No       | `false`               | Skip release if no changes              |
+| `release_count`  | No       | `5`                   | Releases to keep in changelog (0 = all) |
 
 **Secrets:**
 
@@ -712,10 +822,10 @@ This repo uses its own `release-version.yml` workflow (via `_release.yml`) to cr
 
 ```yaml
 # Pin to major version (recommended)
-uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1
+uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2
 
 # Pin to specific version
-uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v1.2.3
+uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2.0.4
 ```
 
 ### Automated Updates with Renovate
