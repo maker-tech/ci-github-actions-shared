@@ -1,3 +1,10 @@
+## [2.1.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.4...v2.1.0) (2026-05-08)
+
+
+### Features
+
+* update renovate ([#54](https://github.com/maker-tech/ci-github-actions-shared/issues/54)) ([40b6fb4](https://github.com/maker-tech/ci-github-actions-shared/commit/40b6fb4b8a9d4a4fde7a46b37c08f7ec83c443d1))
+
 ## [2.0.4](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.3...v2.0.4) (2026-03-18)
 
 
