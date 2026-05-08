@@ -1,32 +1,57 @@
 [
-  {
-    "name": "dependencies",
-    "color": "0366d6",
-    "description": "Dependency updates"
-  },
-  {
-    "name": "automated",
-    "color": "ededed",
-    "description": "Automated PR"
-  },
-  {
-    "name": "dev-deps",
-    "color": "1d76db",
-    "description": "Development dependency updates"
-  },
-  {
-    "name": "prod-deps",
-    "color": "d93f0b",
-    "description": "Production dependency updates"
-  },
-  {
-    "name": "github-actions",
-    "color": "000000",
-    "description": "GitHub Actions updates"
-  },
-  {
-    "name": "security",
-    "color": "b60205",
-    "description": "Security vulnerability fix"
-  }
+	{
+		"name": "dependencies",
+		"color": "0366d6",
+		"description": "Dependency updates"
+	},
+	{
+		"name": "automated",
+		"color": "ededed",
+		"description": "Automated PR"
+	},
+	{
+		"name": "dev-deps",
+		"color": "1d76db",
+		"description": "Development dependency updates"
+	},
+	{
+		"name": "prod-deps",
+		"color": "d93f0b",
+		"description": "Production dependency updates"
+	},
+	{
+		"name": "github-actions",
+		"color": "000000",
+		"description": "GitHub Actions updates"
+	},
+	{
+		"name": "security",
+		"color": "b60205",
+		"description": "Security vulnerability fix"
+	},
+	{
+		"name": "ci-inheritance",
+		"color": "6f42c1",
+		"description": "Shared CI workflow inheritance update"
+	},
+	{
+		"name": "breaking-change",
+		"color": "e11d48",
+		"description": "Contains breaking changes"
+	},
+	{
+		"name": "nodejs",
+		"color": "026e00",
+		"description": "Node.js version update"
+	},
+	{
+		"name": "remediation-attempted",
+		"color": "D93F0B",
+		"description": "Automated fix already pushed — do not retry"
+	},
+	{
+		"name": "remediation-needs-review",
+		"color": "FBCA04",
+		"description": "Automated analysis complete — human decision needed"
+	}
 ]
