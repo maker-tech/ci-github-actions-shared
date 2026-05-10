@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.1.0...v2.1.1) (2026-05-10)
+
+
+### Bug Fixes
+
+* use cron job times for scheduling, set ignored authors ([#56](https://github.com/maker-tech/ci-github-actions-shared/issues/56)) ([c56e2bd](https://github.com/maker-tech/ci-github-actions-shared/commit/c56e2bd95ffd7d5b5b01b7eb5180165206983c22))
+
 ## [2.1.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.0.4...v2.1.0) (2026-05-08)
 
 
