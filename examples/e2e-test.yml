@@ -31,7 +31,7 @@ jobs:
       ## Optional (uncomment to override defaults)
       # playwright_version: '1.55.1'                          # Playwright version
       # axe_core_version: '4.11.0'                            # Axe accessibility testing library version
-      # node_version: '22'                                    # Node.js version
+      # node_version: '24'                                    # Node.js version
       # test_browser: chromium                                # options: chromium, firefox, webkit
       # shard_total: 4                                        # Number of parallel shards
       # artifact_retention_days: 30                           # Days to keep test report artifacts

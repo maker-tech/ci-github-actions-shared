@@ -180,7 +180,7 @@ jobs:
     with:
       package_manager: pnpm
       pnpm_version: '10.28.2'
-      node_version: '22.12.0'
+      node_version: '24.19.0'
       run_lint: true
       run_typecheck: true
       run_tests: false

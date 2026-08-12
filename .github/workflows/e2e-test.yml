@@ -32,7 +32,7 @@ on:
       node_version:
         description: 'Node.js version'
         type: string
-        default: '22'
+        default: '24'
       target_url:
         description: 'Target URL to run tests against'
         type: string

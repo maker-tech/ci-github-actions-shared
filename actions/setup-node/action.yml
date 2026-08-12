@@ -6,7 +6,7 @@
 #     with:
 #       package_manager: pnpm
 #       pnpm_version: 10.28.2
-#       node_version: 22.12.0
+#       node_version: 24.19.0
 
 name: Setup Node.js
 description: 'Setup Node.js with package-manager aware caching'
@@ -23,7 +23,7 @@ inputs:
   node_version:
     description: 'Node.js version to install'
     required: false
-    default: '22.12.0'
+    default: '24.19.0'
   working_directory:
     description: 'Working directory containing lockfile'
     required: false
@@ -38,7 +38,7 @@ runs:
   steps:
     - name: Setup pnpm
       if: inputs.package_manager == 'pnpm'
-      uses: pnpm/action-setup@v4
+      uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5.0.0
       with:
         version: ${{ inputs.pnpm_version }}
 

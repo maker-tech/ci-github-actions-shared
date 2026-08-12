@@ -59,7 +59,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
 ## Defaults
 
 - **Package manager**: `pnpm` (overrideable via inputs)
-- **Node.js**: `22.12.0` (overrideable via inputs)
+- **Node.js**: `24.19.0` (overrideable via inputs)
 
 > **Note**: For Vercel deployments, use the [Deploy via Vercel CLI + Release](#deploy-via-vercel-cli--release) pattern to deploy via the Vercel CLI and create releases in a single workflow.
 
@@ -174,7 +174,7 @@ jobs:
       package_manager: pnpm
       ## Defaults (uncomment to override)
       # pnpm_version: '10.28.2'
-      # node_version: '22.12.0'
+      # node_version: '24.19.0'
       # run_lint: true
       # run_typecheck: true
       # run_tests: false
@@ -289,7 +289,7 @@ jobs:
       package_manager: pnpm
       ## Optional (uncomment to override defaults)
       # pnpm_version: '10.28.2'
-      # node_version: '22.12.0'
+      # node_version: '24.19.0'
       # run_lint: true
       # run_typecheck: true
       # run_tests: false
@@ -327,7 +327,7 @@ jobs:
       package_manager: pnpm
       ## Defaults (uncomment to override)
       # pnpm_version: '10.28.2'
-      # node_version: '22.12.0'
+      # node_version: '24.19.0'
       # working_directory: '.'
       # fetch_depth: 0
       # chromatic_command: ''
@@ -357,7 +357,7 @@ jobs:
       ## Defaults (uncomment to override)
       # playwright_version: '1.55.1'
       # axe_core_version: '4.11.0'
-      # node_version: '22'
+      # node_version: '24'
       # test_browser: chromium  #options: chromium,firefox,webkit
       # shard_total: 4
       # artifact_retention_days: 30
@@ -615,7 +615,7 @@ Runs linting, type checking, and tests. No deployment.
 | ------------------- | -------- | --------- | --------------------------------- |
 | `package_manager`   | No       | `pnpm`    | Package manager (`pnpm` or `npm`) |
 | `pnpm_version`      | No       | `10.28.2` | pnpm version (when using pnpm)    |
-| `node_version`      | No       | `22.12.0` | Node.js version                   |
+| `node_version`      | No       | `24.19.0` | Node.js version                   |
 | `working_directory` | No       | `.`       | Directory containing the app      |
 | `run_lint`          | No       | `true`    | Run linting                       |
 | `run_tests`         | No       | `true`    | Run tests                         |
@@ -633,7 +633,7 @@ Deploy Chromatic (typically used on `uat` or similar).
 | ------------------- | -------- | --------- | --------------------------------------------- |
 | `package_manager`   | No       | `pnpm`    | Package manager (`pnpm` or `npm`)             |
 | `pnpm_version`      | No       | `10.28.2` | pnpm version (when using pnpm)                |
-| `node_version`      | No       | `22.12.0` | Node.js version                               |
+| `node_version`      | No       | `24.19.0` | Node.js version                               |
 | `working_directory` | No       | `.`       | Directory containing the app                  |
 | `fetch_depth`       | No       | `0`       | Git fetch depth (0 for full history)          |
 | `chromatic_command` | No       | -         | Command to run (blank uses defaults)          |
@@ -657,7 +657,7 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 | ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------- |
 | `playwright_version`      | No       | `1.55.1`                          | Playwright version                                                  |
 | `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                           |
-| `node_version`            | No       | `22`                              | Node.js version                                                     |
+| `node_version`            | No       | `24`                              | Node.js version                                                     |
 | `target_url`              | Yes      | -                                 | Target URL to run tests against                                     |
 | `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit ) |
 | `shard_total`             | No       | `4`                               | Number of parallel shards                                           |
@@ -767,7 +767,7 @@ steps:
     with:
       package_manager: pnpm
       pnpm_version: 10.28.2
-      node_version: 22.12.0
+      node_version: 24.19.0
 
   - uses: maker-tech/ci-github-actions-shared/actions/nextjs-build@v1
     with:
