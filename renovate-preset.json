@@ -1,6 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"description": "Shareable Renovate preset for maker-tech repositories. Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared:renovate-preset\"]",
+	"description": "Shareable Renovate preset for maker-tech repositories. Does not enable automerge (opens PRs only). Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared:renovate-preset\"]",
 	"extends": ["config:recommended", ":ignoreUnstable"],
 	"timezone": "Pacific/Auckland",
 	"schedule": ["* 0-6 * * 1-5"],
