@@ -45,6 +45,8 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
   - [Security Model](#security-model)
   - [Versioning \& Updates](#versioning--updates)
     - [Automated Updates with Renovate](#automated-updates-with-renovate)
+      - [Shareable preset (consuming repositories)](#shareable-preset-consuming-repositories)
+      - [This repository's own Renovate config](#this-repositorys-own-renovate-config)
       - [Optional: enable Renovate automerge in the consuming repository](#optional-enable-renovate-automerge-in-the-consuming-repository)
   - [What These Workflows Will NOT Do](#what-these-workflows-will-not-do)
   - [Contributing — Workflow Authoring Rules](#contributing--workflow-authoring-rules)
@@ -59,7 +61,7 @@ Standardised, reusable GitHub Actions workflows for building and deploying Next.
 ## Defaults
 
 - **Package manager**: `pnpm` (overrideable via inputs)
-- **Node.js**: `22.12.0` (overrideable via inputs)
+- **Node.js**: `24.19.0` (overrideable via inputs)
 
 > **Note**: For Vercel deployments, use the [Deploy via Vercel CLI + Release](#deploy-via-vercel-cli--release) pattern to deploy via the Vercel CLI and create releases in a single workflow.
 
@@ -174,7 +176,7 @@ jobs:
       package_manager: pnpm
       ## Defaults (uncomment to override)
       # pnpm_version: '10.28.2'
-      # node_version: '22.12.0'
+      # node_version: '24.19.0'
       # run_lint: true
       # run_typecheck: true
       # run_tests: false
@@ -289,7 +291,7 @@ jobs:
       package_manager: pnpm
       ## Optional (uncomment to override defaults)
       # pnpm_version: '10.28.2'
-      # node_version: '22.12.0'
+      # node_version: '24.19.0'
       # run_lint: true
       # run_typecheck: true
       # run_tests: false
@@ -327,7 +329,7 @@ jobs:
       package_manager: pnpm
       ## Defaults (uncomment to override)
       # pnpm_version: '10.28.2'
-      # node_version: '22.12.0'
+      # node_version: '24.19.0'
       # working_directory: '.'
       # fetch_depth: 0
       # chromatic_command: ''
@@ -357,7 +359,7 @@ jobs:
       ## Defaults (uncomment to override)
       # playwright_version: '1.55.1'
       # axe_core_version: '4.11.0'
-      # node_version: '22'
+      # node_version: '24'
       # test_browser: chromium  #options: chromium,firefox,webkit
       # shard_total: 4
       # artifact_retention_days: 30
@@ -615,7 +617,7 @@ Runs linting, type checking, and tests. No deployment.
 | ------------------- | -------- | --------- | --------------------------------- |
 | `package_manager`   | No       | `pnpm`    | Package manager (`pnpm` or `npm`) |
 | `pnpm_version`      | No       | `10.28.2` | pnpm version (when using pnpm)    |
-| `node_version`      | No       | `22.12.0` | Node.js version                   |
+| `node_version`      | No       | `24.19.0` | Node.js version                   |
 | `working_directory` | No       | `.`       | Directory containing the app      |
 | `run_lint`          | No       | `true`    | Run linting                       |
 | `run_tests`         | No       | `true`    | Run tests                         |
@@ -633,7 +635,7 @@ Deploy Chromatic (typically used on `uat` or similar).
 | ------------------- | -------- | --------- | --------------------------------------------- |
 | `package_manager`   | No       | `pnpm`    | Package manager (`pnpm` or `npm`)             |
 | `pnpm_version`      | No       | `10.28.2` | pnpm version (when using pnpm)                |
-| `node_version`      | No       | `22.12.0` | Node.js version                               |
+| `node_version`      | No       | `24.19.0` | Node.js version                               |
 | `working_directory` | No       | `.`       | Directory containing the app                  |
 | `fetch_depth`       | No       | `0`       | Git fetch depth (0 for full history)          |
 | `chromatic_command` | No       | -         | Command to run (blank uses defaults)          |
@@ -657,7 +659,7 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 | ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------- |
 | `playwright_version`      | No       | `1.55.1`                          | Playwright version                                                  |
 | `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                           |
-| `node_version`            | No       | `22`                              | Node.js version                                                     |
+| `node_version`            | No       | `24`                              | Node.js version                                                     |
 | `target_url`              | Yes      | -                                 | Target URL to run tests against                                     |
 | `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit ) |
 | `shard_total`             | No       | `4`                               | Number of parallel shards                                           |
@@ -767,7 +769,7 @@ steps:
     with:
       package_manager: pnpm
       pnpm_version: 10.28.2
-      node_version: 22.12.0
+      node_version: 24.19.0
 
   - uses: maker-tech/ci-github-actions-shared/actions/nextjs-build@v1
     with:
@@ -830,7 +832,18 @@ uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2.0.4
 
 ### Automated Updates with Renovate
 
-This repo provides a **shareable Renovate preset** for consumer repositories. Use it to automatically track shared workflow updates and manage npm dependencies with sensible defaults.
+This repository has **two separate Renovate configs**. They are not interchangeable.
+
+| Config                 | File                                             | Used by                                  | Automerge                                                                                                 |
+| ---------------------- | ------------------------------------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Shareable preset       | [`renovate-preset.json`](renovate-preset.json)   | Consuming repositories that `extends` it | **Off.** Opens PRs only. `automergeSchedule` is a time window, not an enable switch.                      |
+| This repo's own config | [`.github/renovate.json`](.github/renovate.json) | This repository only                     | **On for a small allowlist** of trusted GitHub Actions (minor, patch, digest). Everything else is manual. |
+
+Do not extend the shareable preset from this repository's own `.github/renovate.json`. This repo is GitHub Actions only and uses a dedicated config.
+
+#### Shareable preset (consuming repositories)
+
+Use the preset in a consuming repository to track shared workflow updates and apply common Renovate defaults. It does **not** turn on automerge.
 
 **Minimal consumer `renovate.json`:**
 
@@ -840,50 +853,30 @@ This repo provides a **shareable Renovate preset** for consumer repositories. Us
 	"extends": [
 		"config:recommended",
 		"github>maker-tech/ci-github-actions-shared:renovate-preset"
-	],
-	"timezone": "Pacific/Auckland",
-	"schedule": ["before 8am every weekday"],
-	"automergeSchedule": ["before 8am every weekday"]
+	]
 }
 ```
 
-That's it. The preset handles everything else.
+The preset already sets timezone, weekday schedule, labels, and `minimumReleaseAge`. You only need extra keys in the consuming repo when you want to override those, or to opt into automerge (see below).
 
-#### Optional: enable Renovate automerge in the consuming repository
-
-If you want Renovate to automatically merge **patch** and/or **minor** updates in the external project while still requiring human reviews for non-Renovate PRs, apply that setup in the **consumer repository**, not in this shared-workflows repo.
-
-Use [docs/branch-protection-and-automerge.md](docs/branch-protection-and-automerge.md) for the full step-by-step process. In short:
-
-- Put your human review requirement in one ruleset and add Renovate to the bypass list there.
-- Put your required CI checks in a separate ruleset and do **not** let Renovate bypass those checks.
-- Keep `platformAutomerge: false` in the consuming repo so Renovate merges via its own token instead of GitHub native auto-merge.
-
-This gives you the split you usually want:
-
-- Renovate patch/minor PRs can merge automatically after required checks pass.
-- Human PRs still need normal reviewer approval before they can merge.
-
-The guide uses `dev` as the protected branch in its examples, but the same pattern applies to whichever long-lived branch in the consuming repo receives Renovate PRs.
+**Automerge:** the preset never sets `automerge: true`. Renovate's default is `false`, so patch, minor, major, and shared-workflow PRs all wait for a human. Majors are also explicitly `automerge: false`. `automergeSchedule` only matters if the consuming repo later enables automerge.
 
 **What the preset includes:**
 
-| Category                | Behaviour                                                    |
-| ----------------------- | ------------------------------------------------------------ |
-| Shared workflow refs    | Auto-detect `ci-github-actions-shared/...@vX` and create PRs |
-| Major version updates   | Flagged as breaking with review checklist                    |
-| Dev dependencies        | Grouped, 14-day stability period                             |
-| Production dependencies | Grouped (non-critical), 14-day stability                     |
-| Critical packages       | Individual PRs (next, react, typescript, etc.)               |
-| Node.js version         | Notes to align with shared workflow defaults                 |
+| Category                           | Behaviour                                                                                                                        |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Shared workflow refs               | Auto-detect `ci-github-actions-shared/...@vX` and open PRs                                                                       |
+| Shared workflow minor/patch        | Grouped, `ci-inheritance` label, 3-day wait, review checklist. **Not** automerged.                                               |
+| Shared workflow major              | `breaking-change` label, 7-day wait, migration checklist. Never automerged.                                                      |
+| Other major updates                | `automerge: false`                                                                                                               |
+| GitHub Actions                     | Digest pinning (`pinDigests: true`)                                                                                              |
+| Vulnerability alerts               | Enabled, `security` label, no 14-day wait                                                                                        |
+| Node.js version (`nvm` / `nodenv`) | Notes to align with shared workflow defaults                                                                                     |
+| Schedule                           | PRs created 00:00–06:00 weekdays (NZT). Automerge window 00:00–07:00 weekdays **if** automerge is enabled in the consuming repo. |
 
-**Critical packages** (get individual PRs):
+**Adding project-specific package rules:**
 
-`next`, `react`, `react-dom`, `next-auth`, `tailwindcss`, `typescript`, `zod`, `@tanstack/react-query`
-
-**Adding project-specific critical packages:**
-
-If your project uses additional packages that should get individual PRs (e.g. `@sentry/*`, `@builder.io/*`), extend the preset in your repo's `renovate.json`:
+Extend the preset in the consuming repo's `renovate.json` for packages that should get extra labels, a longer wait, or no automerge:
 
 ```json
 {
@@ -892,14 +885,12 @@ If your project uses additional packages that should get individual PRs (e.g. `@
 		"config:recommended",
 		"github>maker-tech/ci-github-actions-shared:renovate-preset"
 	],
-	"timezone": "Pacific/Auckland",
-	"schedule": ["before 8am every weekday"],
-	"automergeSchedule": ["before 8am every weekday"],
 	"packageRules": [
 		{
 			"description": "Project-specific critical packages",
 			"matchPackageNames": ["/^@sentry//", "/^@builder\\.io//"],
 			"labels": ["dependencies", "critical"],
+			"automerge": false,
 			"minimumReleaseAge": "14 days",
 			"prPriority": 15
 		}
@@ -915,6 +906,37 @@ If your project uses additional packages that should get individual PRs (e.g. `@
 | Updates require manual sync   | Updates via Renovate PRs            |
 | Drift between repositories    | Consistent behaviour everywhere     |
 | Template bloat                | Single source of truth              |
+
+#### This repository's own Renovate config
+
+[`.github/renovate.json`](.github/renovate.json) is for maintainers of this shared-workflows repo. It does **not** extend the shareable preset.
+
+| Updates                                                                                                                                                   | Automerge                 |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| Trusted GitHub Actions (`actions/checkout`, `actions/setup-node`, `actions/cache`, `actions/upload-artifact`, `pnpm/action-setup`) — minor, patch, digest | Yes (`automergeType: pr`) |
+| Other GitHub Actions                                                                                                                                      | No                        |
+| Major updates                                                                                                                                             | No                        |
+
+Trusted-action PRs still wait for the 14-day `minimumReleaseAge` (except vulnerability alerts) and only merge during `automergeSchedule` (00:00–07:00 weekdays, NZT).
+
+#### Optional: enable Renovate automerge in the consuming repository
+
+The shareable preset will not automerge for you. If you want Renovate to merge **patch** and/or **minor** updates after CI passes, add `automerge: true` in the **consuming** repository's `.github/renovate.json`, then set up GitHub rulesets so Renovate can merge without human review while still passing required checks.
+
+Use [docs/branch-protection-and-automerge.md](docs/branch-protection-and-automerge.md) for the full step-by-step process. In short:
+
+- Add package rules in the consuming repo that set `automerge: true` for the update types you want. The preset does not do this.
+- Keep shared-workflow updates (`maker-tech/ci-github-actions-shared`) on manual review unless you explicitly want those to automerge too.
+- Put your human review requirement in one ruleset and add Renovate to the bypass list there.
+- Put your required CI checks in a separate ruleset and do **not** let Renovate bypass those checks.
+- Keep `platformAutomerge: false` in the consuming repo so Renovate merges via its own token instead of GitHub native auto-merge.
+
+This gives you the split you usually want:
+
+- Renovate patch/minor PRs can merge automatically after required checks pass.
+- Human PRs still need normal reviewer approval before they can merge.
+
+The guide uses `dev` as the protected branch in its examples, but the same pattern applies to whichever long-lived branch in the consuming repo receives Renovate PRs.
 
 ## What These Workflows Will NOT Do
 

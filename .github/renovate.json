@@ -1,6 +1,6 @@
 {
 	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"description": "Renovate config for ci-github-actions-shared repo (GitHub Actions only)",
+	"description": "Renovate config for this repo only (GitHub Actions). Automerge is limited to trusted core actions on minor/patch/digest. Do not copy this file into consuming repos; they should extend renovate-preset.json instead.",
 	"extends": ["config:recommended", ":ignoreUnstable"],
 	"timezone": "Pacific/Auckland",
 	"schedule": ["* 0-6 * * 1-5"],

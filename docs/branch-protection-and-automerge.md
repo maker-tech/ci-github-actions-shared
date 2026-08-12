@@ -1,14 +1,30 @@
 # Branch Protection, Rulesets, and Renovate Automerge
 
-This guide covers the complete setup for protecting a branch in the **consuming repository** (examples use `dev`) with GitHub Rulesets and enabling Renovate to automerge low-risk dependency updates without human review.
+This guide is for the **consuming repository** (examples use `dev`). It covers GitHub Rulesets plus the extra Renovate config you must add if you want patch/minor updates to automerge.
+
+The shareable preset does **not** enable automerge. Extending it only opens PRs. This repo's own `.github/renovate.json` is also not a template for application repos.
+
+## Two Renovate configs (do not mix them up)
+
+| Config                 | File                                                | Audience                        | Automerge                                                                                                                                                                                                                                     |
+| ---------------------- | --------------------------------------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shareable preset       | [`renovate-preset.json`](../renovate-preset.json)   | Consuming repos via `extends`   | **No.** Opens PRs; humans merge. `automergeSchedule` is only a time window.                                                                                                                                                                   |
+| This repo's own config | [`.github/renovate.json`](../.github/renovate.json) | This shared-workflows repo only | **Yes, but only** for trusted GitHub Actions (`actions/checkout`, `actions/setup-node`, `actions/cache`, `actions/upload-artifact`, `pnpm/action-setup`) on minor, patch, and digest updates. Majors and third-party actions never automerge. |
+
+See the [README Renovate section](../README.md#automated-updates-with-renovate) for the full breakdown of each file.
 
 ## What this achieves
 
+After you complete **both** the rulesets below **and** the consuming-repo `automerge: true` package rules:
+
 - Human PRs in the consuming repository require **2 approving reviews** and **passing CI checks** before merging to `dev`.
-- Renovate dependency PRs in the consuming repository (patch and minor) **automerge without human review** once CI checks pass.
-- Sensitive packages (Next.js, React, next-auth, Builder.io) always require human review, even for patches.
-- Major version updates always require human review.
+- Renovate patch and minor PRs (except packages you exclude) **automerge without human review** once CI checks pass.
+- Shared workflow updates (`maker-tech/ci-github-actions-shared`) stay on manual review unless you explicitly automerge them.
+- Sensitive packages you list (for example Next.js, React, next-auth, Builder.io) stay on manual review, even for patches.
+- Major version updates always require human review (the preset already sets `automerge: false` for majors).
 - Org admins can force-merge when a check is stuck or known-failing.
+
+If you only extend the preset and skip the automerge package rules, Renovate still opens PRs, but nothing merges automatically.
 
 ## Why two rulesets?
 
@@ -29,6 +45,7 @@ GitHub's native auto-merge (`platformAutomerge: true`) respects **all** ruleset 
 
 - Admin access to the **consuming repository** on GitHub.
 - The Renovate GitHub App installed on the consuming repo/org.
+- A consuming-repo `.github/renovate.json` that extends the shareable preset **and** sets `automerge: true` for the updates you want (see [example config](#example-consuming-repo-config)). The preset alone does not automerge.
 - The `quality-checks.yml` and `lint-pr-title.yml` workflows committed in the consuming repository and run at least once there (so check names appear in GitHub's dropdown).
 
 ---
@@ -180,7 +197,7 @@ jobs:
     with:
       package_manager: pnpm
       pnpm_version: '10.28.2'
-      node_version: '22.12.0'
+      node_version: '24.19.0'
       run_lint: true
       run_typecheck: true
       run_tests: false
@@ -213,19 +230,61 @@ The gate uses `if: ${{ !cancelled() }}` rather than `if: always()`. Both handle 
 
 ## Renovate automerge configuration
 
-The Renovate config in the consuming repository at `.github/renovate.json` controls which dependency updates automerge.
+The shareable preset never sets `automerge: true`. Automerge only happens if the **consuming repository** adds it in `.github/renovate.json`.
 
-### What automerges
+This shared-workflows repo's [`.github/renovate.json`](../.github/renovate.json) is unrelated: it automerges a small allowlist of GitHub Actions used here, and should not be copied into an application repo.
+
+### Example consuming-repo config
+
+```json
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": [
+		"config:recommended",
+		"github>maker-tech/ci-github-actions-shared:renovate-preset"
+	],
+	"platformAutomerge": false,
+	"packageRules": [
+		{
+			"description": "Automerge patch and minor updates",
+			"matchUpdateTypes": ["minor", "patch"],
+			"automerge": true,
+			"automergeType": "pr"
+		},
+		{
+			"description": "Shared CI workflows stay on manual review",
+			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
+			"automerge": false
+		},
+		{
+			"description": "Sensitive packages stay on manual review",
+			"matchPackageNames": [
+				"next",
+				"react",
+				"react-dom",
+				"next-auth",
+				"/^@builder\\.io//"
+			],
+			"automerge": false
+		}
+	]
+}
+```
+
+Later `packageRules` override earlier ones, so the shared-workflow and sensitive-package rules must come **after** the blanket minor/patch automerge rule. Without those exclusions, enabling automerge for all minor/patch updates would also merge shared workflow PRs (the preset only adds a review checklist; it does not disable automerge).
+
+### What automerges (with the example above)
 
 - **Patch** and **minor** updates for most dependencies.
 - Renovate opens a PR, CI runs, and once checks pass Renovate merges it automatically — no human approval needed.
-- Updates must be at least **14 days old** (`minimumReleaseAge`) before Renovate will create a PR.
-- Both PR creation (`schedule`) and automerging (`automergeSchedule`) run **before 8am every weekday** (NZT). This gives Renovate frequent windows to act, while keeping activity outside working hours.
+- Updates must be at least **14 days old** (`minimumReleaseAge` from the preset) before Renovate will create a PR.
+- Both PR creation (`schedule`) and automerging (`automergeSchedule`) run **before 8am every weekday** (NZT). The preset already sets these windows. `automergeSchedule` does nothing until `automerge: true` is set.
 
-### What requires manual review
+### What still requires manual review
 
-- **Major** version updates (always manual).
-- **Sensitive packages** — even patch/minor updates for these require 2 human approvals:
+- **Major** version updates (the preset sets `automerge: false`).
+- **Shared CI workflows** (`maker-tech/ci-github-actions-shared`) if you keep the exclusion above.
+- **Sensitive packages** you list — even patch/minor updates. The example uses:
   - `next` (framework — known for breaking changes in patches)
   - `react` / `react-dom` (core runtime)
   - `next-auth` (authentication — security-critical)
@@ -244,15 +303,17 @@ After completing the setup in the consuming repository, verify each scenario wor
 
 ### Test 1 — Renovate patch/minor PR automerges
 
+This test only applies after the consuming repo has `automerge: true` for patch/minor (see the example config above). Extending the preset alone is not enough.
+
 1. Wait for the next Renovate schedule (before 8am on any weekday, NZT) or trigger a manual run from the Dependency Dashboard issue.
-2. A patch or minor PR should:
+2. A patch or minor PR (not a shared-workflow or sensitive-package PR) should:
    - Show `CI Gate` and `Lint PR Title` checks running.
    - Display "2 approvals required" in the merge box (this is normal — the UI always shows it).
    - Merge automatically once checks pass, **without any human approval**.
 
-### Test 2 — Sensitive package PR requires review
+### Test 2 — Sensitive package and shared-workflow PRs require review
 
-1. If a PR appears for `next`, `react`, `next-auth`, or `@builder.io/*`:
+1. If a PR appears for `next`, `react`, `next-auth`, `@builder.io/*`, or `maker-tech/ci-github-actions-shared`:
    - It should NOT automerge.
    - It should require 2 human approvals before merging.
 
@@ -277,10 +338,12 @@ After completing the setup in the consuming repository, verify each scenario wor
 
 ## Troubleshooting
 
-| Symptom                                         | Likely cause                                                                     | Fix                                                             |
-| ----------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Renovate PR stuck waiting for reviews           | Renovate not in Ruleset A bypass list, or classic branch protection still exists | Check Ruleset A bypass list; delete classic branch protection   |
-| `CI Gate` shows "Expected — Waiting" forever    | CI Gate check name doesn't match what's in Ruleset B                             | Verify the exact check name in the workflow matches the ruleset |
-| Human PR blocked by a check that never runs     | A Renovate-only check (FOSSA, stability-days) was added to Ruleset B             | Remove it — only add checks that run on all PRs                 |
-| Renovate PR doesn't automerge after checks pass | `platformAutomerge` is set to `true` instead of `false` in `renovate.json`       | Change to `false` so Renovate merges via its own token          |
-| Admin can't force-merge                         | Admin not in bypass list for both rulesets                                       | Add admin to bypass list on both Ruleset A and B                |
+| Symptom                                         | Likely cause                                                                                            | Fix                                                             |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Renovate PR stuck waiting for reviews           | Renovate not in Ruleset A bypass list, or classic branch protection still exists                        | Check Ruleset A bypass list; delete classic branch protection   |
+| `CI Gate` shows "Expected — Waiting" forever    | CI Gate check name doesn't match what's in Ruleset B                                                    | Verify the exact check name in the workflow matches the ruleset |
+| Human PR blocked by a check that never runs     | A Renovate-only check (FOSSA, stability-days) was added to Ruleset B                                    | Remove it — only add checks that run on all PRs                 |
+| Renovate PR doesn't automerge after checks pass | No `automerge: true` rule in the consuming repo (the shareable preset does not enable it)               | Add the package rules from the example config above             |
+| Renovate PR doesn't automerge after checks pass | `platformAutomerge` is set to `true` instead of `false` in `renovate.json`                              | Change to `false` so Renovate merges via its own token          |
+| Shared workflow PR automerged unexpectedly      | Blanket minor/patch `automerge: true` with no later exclusion for `maker-tech/ci-github-actions-shared` | Add `automerge: false` for that dep after the blanket rule      |
+| Admin can't force-merge                         | Admin not in bypass list for both rulesets                                                              | Add admin to bypass list on both Ruleset A and B                |
