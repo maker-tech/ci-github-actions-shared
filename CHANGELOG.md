@@ -1,3 +1,10 @@
+## [2.1.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.1.1...v2.1.2) (2026-08-12)
+
+
+### Bug Fixes
+
+* **ci:** bump default Node.js to 24 and run pnpm/action-setup on Node 24 ([#58](https://github.com/maker-tech/ci-github-actions-shared/issues/58)) ([534dd2f](https://github.com/maker-tech/ci-github-actions-shared/commit/534dd2f9b4a2c8bfb35a4e93b86137c6403c5421))
+
 ## [2.1.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.1.0...v2.1.1) (2026-05-10)
 
 
