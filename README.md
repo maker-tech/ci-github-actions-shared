@@ -362,6 +362,7 @@ jobs:
       # node_version: '24'
       # test_browser: chromium  #options: chromium,firefox,webkit
       # shard_total: 4
+      # fail_fast: false
       # artifact_retention_days: 30
       # fail_screenshots_path: 'tests/functional/screenshots/**'
     secrets:
@@ -663,6 +664,7 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 | `target_url`              | Yes      | -                                 | Target URL to run tests against                                     |
 | `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit ) |
 | `shard_total`             | No       | `4`                               | Number of parallel shards                                           |
+| `fail_fast`               | No       | `false`                           | Cancel remaining shards when one fails                              |
 | `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts                                  |
 | `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots                                         |
 
