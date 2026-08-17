@@ -34,6 +34,7 @@ jobs:
       # node_version: '24'                                    # Node.js version
       # test_browser: chromium                                # options: chromium, firefox, webkit
       # shard_total: 4                                        # Number of parallel shards
+      # fail_fast: false                                      # Cancel remaining shards when one fails
       # artifact_retention_days: 30                           # Days to keep test report artifacts
       # fail_screenshots_path: 'tests/functional/screenshots/**' # Path to failure screenshots
     secrets:
