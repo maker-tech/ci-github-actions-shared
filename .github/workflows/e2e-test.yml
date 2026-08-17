@@ -84,7 +84,7 @@ jobs:
   e2e-test:
     needs: setup
     strategy:
-      fail-fast: true # fail the workflow if any shard fails
+      fail-fast: false # Let all shards complete even if one fails
       matrix:
         shardIndex: ${{ fromJSON(needs.setup.outputs.shard_indices) }}
     name: 'E2E Shard ${{ matrix.shardIndex }}/${{ inputs.shard_total }}'
