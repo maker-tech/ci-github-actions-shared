@@ -45,6 +45,10 @@ on:
         description: 'Number of parallel shards'
         type: number
         default: 4
+      fail_fast:
+        description: 'Cancel remaining shards when one fails. Default false so every shard reports its own failures.'
+        type: boolean
+        default: false
       artifact_retention_days:
         description: 'Days to keep test report artifacts'
         type: number
@@ -84,7 +88,7 @@ jobs:
   e2e-test:
     needs: setup
     strategy:
-      fail-fast: true # fail the workflow if any shard fails
+      fail-fast: ${{ inputs.fail_fast }}
       matrix:
         shardIndex: ${{ fromJSON(needs.setup.outputs.shard_indices) }}
     name: 'E2E Shard ${{ matrix.shardIndex }}/${{ inputs.shard_total }}'

@@ -1,3 +1,10 @@
+## [2.2.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.1.2...v2.2.0) (2026-08-17)
+
+
+### Features
+
+* set fail-fast default value to false ([#59](https://github.com/maker-tech/ci-github-actions-shared/issues/59)) ([f082826](https://github.com/maker-tech/ci-github-actions-shared/commit/f0828264d9266f80ef262c8c578ab81452269b32))
+
 ## [2.1.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.1.1...v2.1.2) (2026-08-12)
 
 
