@@ -18,10 +18,10 @@ permissions:
 jobs:
   promote:
     name: 'Promote Dev to UAT'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v2
     with:
-      source_branch: dev  # required -- branch to merge from
-      target_branch: uat  # required -- branch to merge into
+      source_branch: dev # required -- branch to merge from
+      target_branch: uat # required -- branch to merge into
       ## Optional (uncomment to override defaults)
       # merge_message: ''  # Custom merge commit message (blank uses default)
     secrets:

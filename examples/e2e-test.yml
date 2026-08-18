@@ -25,7 +25,7 @@ on:
 jobs:
   e2e:
     name: 'E2E Tests'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v2
     with:
       target_url: https://dev.example.com # required -- target URL to run tests against
       ## Optional (uncomment to override defaults)

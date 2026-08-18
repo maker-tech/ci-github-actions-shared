@@ -13,7 +13,7 @@
 #     workflow_dispatch:
 #   jobs:
 #     sync-labels:
-#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v2
 #       permissions:
 #         contents: read
 #         issues: write

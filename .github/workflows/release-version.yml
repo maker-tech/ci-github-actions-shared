@@ -10,7 +10,7 @@
 # Usage:
 #   jobs:
 #     release:
-#       uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v2
 #       with:
 #         release_branch: main
 #         sync_branch: dev
@@ -85,7 +85,7 @@ jobs:
 
       - name: Conventional Changelog Action
         id: changelog
-        uses: TriPSs/conventional-changelog-action@1abec007de15e5b2b14cce780f02245e4722e862
+        uses: TriPSs/conventional-changelog-action@952b14bbc4be87e8458a6ac5926fc655608b1b19 # v6.3.1
         with:
           github-token: ${{ secrets.CI_GITHUB_TOKEN }}
           git-branch: ${{ inputs.release_branch }}
@@ -95,7 +95,7 @@ jobs:
           release-count: ${{ inputs.release_count }}
 
       - name: Release
-        uses: softprops/action-gh-release@e798e6a1ede8d07b74ac4cdac6bdfa4cc1653907
+        uses: softprops/action-gh-release@3d0d9888cb7fd7b750713d6e236d1fcb99157228 # v3.0.2
         if: ${{ steps.changelog.outputs.skipped == 'false' }}
         with:
           tag_name: ${{ steps.changelog.outputs.tag }}

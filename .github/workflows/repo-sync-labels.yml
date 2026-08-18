@@ -7,7 +7,7 @@
 # Usage:
 #   jobs:
 #     sync-labels:
-#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v2
 #       permissions:
 #         contents: read
 #         issues: write
@@ -15,7 +15,7 @@
 # Usage with extra consumer-specific labels:
 #   jobs:
 #     sync-labels:
-#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v2
 #       with:
 #         extra_labels_file: .github/repo-labels.json
 #         # ci_ref: main  # Ref of ci-github-actions-shared to checkout (tag, branch, or SHA)

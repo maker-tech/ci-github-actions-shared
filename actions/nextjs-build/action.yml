@@ -2,7 +2,7 @@
 # Runs npm ci and npm run build for Next.js projects
 #
 # Usage:
-#   - uses: maker-tech/ci-github-actions-shared/actions/nextjs-build@v1
+#   - uses: maker-tech/ci-github-actions-shared/actions/nextjs-build@v2
 #     with:
 #       working_directory: "."
 #       package_manager: pnpm
