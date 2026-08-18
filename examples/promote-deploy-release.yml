@@ -33,10 +33,10 @@ permissions:
 jobs:
   promote:
     name: 'Promote UAT to Main'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v2
     with:
-      source_branch: uat   # required -- branch to merge from
-      target_branch: main  # required -- branch to merge into
+      source_branch: uat # required -- branch to merge from
+      target_branch: main # required -- branch to merge into
       ## Optional (uncomment to override defaults)
       # merge_message: ''  # Custom merge commit message (blank uses default)
     secrets:
@@ -67,10 +67,10 @@ jobs:
   release:
     name: 'Create Release'
     needs: deploy
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v2
     with:
       release_branch: main # required -- branch where releases are created
-      sync_branch: dev     # required -- branch to sync after release (set to '' to disable)
+      sync_branch: dev # required -- branch to sync after release (set to '' to disable)
       ## Optional (uncomment to override defaults)
       # preset: conventionalcommits  # Changelog preset -- options: conventionalcommits, eslint
       # output_file: CHANGELOG.md    # Changelog output file

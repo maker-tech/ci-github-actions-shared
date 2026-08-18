@@ -127,7 +127,7 @@ permissions:
 jobs:
   promote:
     name: 'Promote Dev to UAT'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v2
     with:
       source_branch: dev
       target_branch: uat
@@ -239,7 +239,7 @@ permissions:
 jobs:
   lint:
     name: 'Lint PR Title'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v2
     ## Defaults (uncomment to override)
     # with:
     #   preset: conventionalcommits  #options: conventionalcommits,eslint
@@ -324,7 +324,7 @@ on:
 jobs:
   chromatic:
     name: 'Deploy Chromatic'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v2
     with:
       package_manager: pnpm
       ## Defaults (uncomment to override)
@@ -353,7 +353,7 @@ on:
 jobs:
   e2e:
     name: 'E2E Tests'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v2
     with:
       target_url: https://dev.levande.com.au
       ## Defaults (uncomment to override)
@@ -391,7 +391,7 @@ permissions:
 jobs:
   promote:
     name: 'Promote Dev to UAT'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v2
     with:
       source_branch: dev
       target_branch: uat
@@ -418,7 +418,7 @@ permissions:
 jobs:
   promote:
     name: 'Promote UAT to Main'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v2
     with:
       source_branch: uat
       target_branch: main
@@ -456,7 +456,7 @@ permissions:
 jobs:
   release:
     name: 'Create Release'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v2
     with:
       release_branch: main
       sync_branch: dev
@@ -506,7 +506,7 @@ jobs:
   release:
     name: 'Create Release'
     needs: deploy
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v2
     with:
       release_branch: main
       sync_branch: dev
@@ -549,7 +549,7 @@ permissions:
 jobs:
   promote:
     name: 'Promote UAT to Main'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/promote-branch.yml@v2
     with:
       source_branch: uat
       target_branch: main
@@ -570,7 +570,7 @@ jobs:
   release:
     name: 'Create Release'
     needs: deploy
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/release-version.yml@v2
     with:
       release_branch: main
       sync_branch: dev
@@ -596,7 +596,7 @@ on:
 
 jobs:
   sync-labels:
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/repo-sync-labels.yml@v2
     ## Defaults (uncomment to override)
     # with:
     #   extra_labels_file: .github/repo-labels.json
@@ -767,13 +767,13 @@ These actions can be used directly in your workflows for more granular control:
 steps:
   - uses: actions/checkout@v6
 
-  - uses: maker-tech/ci-github-actions-shared/actions/setup-node@v1
+  - uses: maker-tech/ci-github-actions-shared/actions/setup-node@v2
     with:
       package_manager: pnpm
       pnpm_version: 10.28.2
       node_version: 24.19.0
 
-  - uses: maker-tech/ci-github-actions-shared/actions/nextjs-build@v1
+  - uses: maker-tech/ci-github-actions-shared/actions/nextjs-build@v2
     with:
       package_manager: pnpm
       skip_install: 'true'
@@ -804,23 +804,23 @@ The shared workflows do not enforce environment rules. For Vercel, use their nat
 
 This repository follows semantic versioning:
 
-- `v1` → backward-compatible updates (floating tag, always points to latest 1.x.x)
-- `v2` → breaking changes
-- `v1.2.3` → exact version (immutable)
+- `v2` → backward-compatible updates (floating tag, always points to latest 2.x.x)
+- `v3` → breaking changes
+- `v2.2.0` → exact version (immutable)
 
-This repo uses its own `release-version.yml` workflow (via `_release.yml`) to create releases. When a new version is released, the major version tag (e.g., `v1`) is automatically updated to point to it.
+This repo uses its own `release-version.yml` workflow (via `_release.yml`) to create releases. When a new version is released, the major version tag (e.g., `v2`) is automatically updated to point to it.
 
 > **Maintainer note — major version tags:**
-> The `_release.yml` workflow automatically force-updates the major version tag (e.g., `v1`) whenever a new `v1.x.x` release is created. This allows consumers to reference `@v1` and always get the latest compatible version.
+> The `_release.yml` workflow automatically force-updates the major version tag (e.g., `v2`) whenever a new `v2.x.x` release is created. This allows consumers to reference `@v2` and always get the latest compatible version.
 >
 > If you ever need to do this manually:
 >
 > ```bash
-> git tag -fa v1 v1.x.x^{} -m "Update v1 to v1.x.x"
-> git push origin v1 --force
+> git tag -fa v2 v2.x.x^{} -m "Update v2 to v2.x.x"
+> git push origin v2 --force
 > ```
 >
-> Replace `v1.x.x` with the actual tag (e.g., `v1.2.3`). The `^{}` dereferences the annotated tag to the underlying commit.
+> Replace `v2.x.x` with the actual tag (e.g., `v2.2.0`). The `^{}` dereferences the annotated tag to the underlying commit.
 
 **You control when to upgrade** by changing the version tag in your workflow files.
 
@@ -829,7 +829,7 @@ This repo uses its own `release-version.yml` workflow (via `_release.yml`) to cr
 uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2
 
 # Pin to specific version
-uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2.0.4
+uses: maker-tech/ci-github-actions-shared/.github/workflows/nextjs-ci.yml@v2.2.0
 ```
 
 ### Automated Updates with Renovate
@@ -1007,7 +1007,7 @@ No. Custom logic belongs in your repository, not shared workflows.
 
 **Can we pin to a specific version?**
 
-Yes, and you should: `@v1.2.3`
+Yes, and you should: `@v2.2.0`
 
 **What happens if a workflow changes?**
 

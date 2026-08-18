@@ -25,7 +25,7 @@ on:
 jobs:
   chromatic:
     name: 'Deploy Chromatic'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/deploy-chromatic.yml@v2
     with:
       package_manager: pnpm # required -- options: pnpm, npm
       ## Optional (uncomment to override defaults)

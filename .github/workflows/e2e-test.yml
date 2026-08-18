@@ -7,7 +7,7 @@
 # Usage:
 #   jobs:
 #     e2e:
-#       uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v1
+#       uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v2
 #       with:
 #         target_url: https://dev.levande.com.au
 #       secrets:

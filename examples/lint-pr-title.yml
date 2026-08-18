@@ -19,7 +19,7 @@ permissions:
 jobs:
   lint:
     name: 'Lint PR Title'
-    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v1
+    uses: maker-tech/ci-github-actions-shared/.github/workflows/lint-pr-title.yml@v2
     ## Defaults (uncomment to override)
     # with:
     #   preset: conventionalcommits  #options: conventionalcommits,eslint
