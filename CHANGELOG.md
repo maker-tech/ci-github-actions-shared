@@ -1,3 +1,10 @@
+## [2.2.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.0...v2.2.1) (2026-08-18)
+
+
+### Bug Fixes
+
+* **ci:** bump release actions to Node 24 and align docs to v2 ([#60](https://github.com/maker-tech/ci-github-actions-shared/issues/60)) ([ffb1335](https://github.com/maker-tech/ci-github-actions-shared/commit/ffb1335c17bd0e16a806c467c63d337471eeb3de))
+
 ## [2.2.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.1.2...v2.2.0) (2026-08-17)
 
 
