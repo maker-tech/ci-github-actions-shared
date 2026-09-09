@@ -89,6 +89,9 @@ jobs:
         with:
           github-token: ${{ secrets.CI_GITHUB_TOKEN }}
           git-branch: ${{ inputs.release_branch }}
+          # Override action defaults so Vercel can map the release commit to a GitHub account.
+          git-user-name: github-actions[bot]
+          git-user-email: github-actions[bot]@users.noreply.github.com
           preset: ${{ inputs.preset }}
           output-file: ${{ inputs.output_file }}
           skip-on-empty: ${{ inputs.skip_on_empty }}
