@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.1...v2.2.2) (2026-09-09)
+
+
+### Bug Fixes
+
+* override defaults so vercel can map release to a github account ([#61](https://github.com/maker-tech/ci-github-actions-shared/issues/61)) ([eeed1bf](https://github.com/maker-tech/ci-github-actions-shared/commit/eeed1bf7568930f8f6f0d8571f0bb067cf33ad44))
+
 ## [2.2.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.0...v2.2.1) (2026-08-18)
 
 
