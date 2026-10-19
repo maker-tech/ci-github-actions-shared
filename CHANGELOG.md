@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.2...v2.2.3) (2026-10-19)
+
+
+### Bug Fixes
+
+* **ci:** forward VERCEL_CI_WAF_BYPASS to Playwright E2E ([#62](https://github.com/maker-tech/ci-github-actions-shared/issues/62)) ([256f2ce](https://github.com/maker-tech/ci-github-actions-shared/commit/256f2ce4ff2b5b7f94254b5c13cc959a93e39bbe))
+
 ## [2.2.2](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.1...v2.2.2) (2026-09-09)
 
 
