@@ -13,6 +13,7 @@
 #       secrets:
 #         BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
 #         BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
+#         VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }}
 #         SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 #
 
@@ -66,6 +67,9 @@ on:
         required: false
       SLACK_WEBHOOK:
         description: 'Slack webhook for failure notifications (optional)'
+        required: false
+      VERCEL_CI_WAF_BYPASS:
+        description: 'Value for x-vercel-ci-waf-bypass (Vercel Firewall CI bypass; optional)'
         required: false
 
 permissions:
@@ -135,6 +139,7 @@ jobs:
           BASE_URL: ${{ inputs.target_url }}
           BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
           BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
+          VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }}
         run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ inputs.shard_total }}
 
       - name: Upload Playwright report

@@ -4,7 +4,7 @@
 # Calls: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml
 #
 # Triggers: push to dev (excluding docs/config changes), manual dispatch
-# Required secrets: none (BASIC_AUTH_USER, BASIC_AUTH_PASSWORD, SLACK_WEBHOOK are optional)
+# Required secrets: none (BASIC_AUTH_*, SLACK_WEBHOOK, VERCEL_CI_WAF_BYPASS are optional)
 # Permissions: contents: read (default)
 
 name: E2E Tests DEV
@@ -41,4 +41,5 @@ jobs:
       ## Optional secrets (uncomment if needed)
       # BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}         # Basic auth username for protected environments
       # BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }} # Basic auth password for protected environments
+      # VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }} # Vercel Firewall CI bypass (x-vercel-ci-waf-bypass header in playwright.config.ts)
       # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}        # Slack webhook for failure notifications
