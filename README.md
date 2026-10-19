@@ -203,16 +203,17 @@ Add the required secrets to your repository:
 
 **Settings → Secrets and variables → Actions**
 
-| Secret                    | Required For              | Permissions                                                                 |
-| ------------------------- | ------------------------- | --------------------------------------------------------------------------- |
-| `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     | Chromatic project token                                                     |
-| `CI_GITHUB_TOKEN`         | Branch promotion/releases | Fine-grained PAT with **Contents: Read and write** on the target repository |
-| `BASIC_AUTH_USER`         | E2E tests (optional)      | Basic auth username for protected environments                              |
-| `BASIC_AUTH_PASSWORD`     | E2E tests (optional)      | Basic auth password for protected environments                              |
-| `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                  |
-| `VERCEL_TOKEN`            | Vercel CLI deploys        | Vercel access token scoped to the correct team                              |
-| `VERCEL_ORG_ID`           | Vercel CLI deploys        | Vercel org/team ID (`team_xxx`)                                             |
-| `VERCEL_PROJECT_ID`       | Vercel CLI deploys        | Vercel project ID (`prj_xxx`)                                               |
+| Secret                    | Required For              | Permissions                                                                                       |
+| ------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------- |
+| `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     | Chromatic project token                                                                           |
+| `CI_GITHUB_TOKEN`         | Branch promotion/releases | Fine-grained PAT with **Contents: Read and write** on the target repository                       |
+| `BASIC_AUTH_USER`         | E2E tests (optional)      | Basic auth username for protected environments                                                    |
+| `BASIC_AUTH_PASSWORD`     | E2E tests (optional)      | Basic auth password for protected environments                                                    |
+| `VERCEL_CI_WAF_BYPASS`    | E2E tests (optional)      | Vercel Firewall CI bypass token (`x-vercel-ci-waf-bypass`; set in Playwright config when present) |
+| `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                                        |
+| `VERCEL_TOKEN`            | Vercel CLI deploys        | Vercel access token scoped to the correct team                                                    |
+| `VERCEL_ORG_ID`           | Vercel CLI deploys        | Vercel org/team ID (`team_xxx`)                                                                   |
+| `VERCEL_PROJECT_ID`       | Vercel CLI deploys        | Vercel project ID (`prj_xxx`)                                                                     |
 
 ## Common Wrapper Examples
 
@@ -368,6 +369,7 @@ jobs:
     secrets:
       BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
       BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
+      VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
 ```
 
@@ -670,11 +672,12 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 
 **Secrets:**
 
-| Name                  | Required | Notes                                          |
-| --------------------- | -------- | ---------------------------------------------- |
-| `BASIC_AUTH_USER`     | No       | Basic auth username for protected environments |
-| `BASIC_AUTH_PASSWORD` | No       | Basic auth password for protected environments |
-| `SLACK_WEBHOOK`       | No       | Slack incoming webhook URL                     |
+| Name                   | Required | Notes                                                                                                                                        |
+| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BASIC_AUTH_USER`      | No       | Basic auth username for protected environments                                                                                               |
+| `BASIC_AUTH_PASSWORD`  | No       | Basic auth password for protected environments                                                                                               |
+| `VERCEL_CI_WAF_BYPASS` | No       | Vercel Firewall CI bypass; wire `process.env.VERCEL_CI_WAF_BYPASS` to `extraHTTPHeaders['x-vercel-ci-waf-bypass']` in `playwright.config.ts` |
+| `SLACK_WEBHOOK`        | No       | Slack incoming webhook URL                                                                                                                   |
 
 ---
 
