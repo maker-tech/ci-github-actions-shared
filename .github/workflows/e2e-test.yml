@@ -20,7 +20,8 @@
 #           MY_TESTING_BYPASS_KEY=${{ secrets.MY_TESTING_BYPASS_KEY }}
 #
 # Playwright version: leave `playwright_version` empty to use the exact version of
-# @playwright/test in the caller's package.json (falls back to 1.55.1).
+# @playwright/test in the caller's package.json (falls back to 1.55.1). In a monorepo,
+# set `package_json_path` (e.g. website/package.json) to read it from a subfolder.
 #
 # VERCEL_CI_WAF_BYPASS: do NOT put it in `extraHTTPHeaders`. That sends the header to
 # every host, and third-party APIs (e.g. Contentful) reject it in CORS preflight.
@@ -33,9 +34,13 @@ on:
   workflow_call:
     inputs:
       playwright_version:
-        description: 'Exact Playwright version. Empty reads @playwright/test from package.json, falling back to 1.55.1.'
+        description: 'Exact Playwright version. Empty reads @playwright/test from package_json_path, falling back to 1.55.1.'
         type: string
         default: ''
+      package_json_path:
+        description: 'package.json to read @playwright/test from when playwright_version is empty, relative to the repo root (e.g. website/package.json in a monorepo)'
+        type: string
+        default: 'package.json'
       axe_core_version:
         description: 'Axe accessibility testing library version'
         type: string
@@ -130,13 +135,17 @@ jobs:
         shell: bash
         env:
           INPUT_VERSION: ${{ inputs.playwright_version }}
+          PACKAGE_JSON_PATH: ${{ inputs.package_json_path }}
           FALLBACK_VERSION: '1.55.1'
         run: |
           # Must run before package.json is swapped out in the install step.
           node <<'EOF' >> "$GITHUB_OUTPUT"
           const fs = require('fs');
+          const path = require('path');
           const semver = /[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?/;
           const fallback = process.env.FALLBACK_VERSION;
+          const pkgPath = (process.env.PACKAGE_JSON_PATH || '').trim() || 'package.json';
+          const isDefaultPath = path.normalize(pkgPath) === 'package.json';
           let version = (process.env.INPUT_VERSION || '').trim();
           let source = 'playwright_version input';
 
@@ -148,21 +157,32 @@ jobs:
             }
             version = match[0];
           } else {
+            const root = process.cwd();
+            const resolved = path.resolve(root, pkgPath);
+            if (path.isAbsolute(pkgPath) || !resolved.startsWith(root + path.sep)) {
+              console.error(`::error::package_json_path "${pkgPath}" must be a relative path inside the repository`);
+              process.exit(1);
+            }
             let spec;
             try {
-              const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              const pkg = JSON.parse(fs.readFileSync(resolved, 'utf8'));
               spec = pkg.devDependencies?.['@playwright/test'] ?? pkg.dependencies?.['@playwright/test'];
             } catch (err) {
-              console.error(`::warning::Could not read package.json: ${err.message}`);
+              // An explicitly configured path that can't be read is a caller mistake: fail loudly.
+              if (!isDefaultPath) {
+                console.error(`::error::Could not read package_json_path "${pkgPath}": ${err.message}`);
+                process.exit(1);
+              }
+              console.error(`::warning::Could not read ${pkgPath}: ${err.message}`);
             }
             const match = spec && String(spec).match(semver);
             if (match) {
               version = match[0];
-              source = `package.json (${spec})`;
+              source = `${pkgPath} (${spec})`;
             } else {
               version = fallback;
               source = 'fallback';
-              console.error(`::warning::@playwright/test is missing or unparseable in package.json (${spec ?? 'missing'}); using ${fallback}`);
+              console.error(`::warning::@playwright/test is missing or unparseable in ${pkgPath} (${spec ?? 'missing'}); using ${fallback}. Set package_json_path if it lives in a subfolder, or set playwright_version.`);
             }
           }
 

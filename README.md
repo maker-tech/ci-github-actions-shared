@@ -359,7 +359,8 @@ jobs:
     with:
       target_url: https://dev.levande.com.au
       ## Defaults (uncomment to override)
-      # playwright_version: ''  # empty = @playwright/test from package.json
+      # playwright_version: ''  # empty = @playwright/test from package_json_path
+      # package_json_path: package.json  # monorepo: e.g. website/package.json
       # axe_core_version: '4.11.0'
       # dotenv_version: '17.4.2'
       # node_version: '24'
@@ -663,18 +664,19 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 
 **Inputs:**
 
-| Name                      | Required | Default                           | Description                                                                                      |
-| ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `playwright_version`      | No       | `''`                              | Exact Playwright version. Empty reads `@playwright/test` from `package.json` (fallback `1.55.1`) |
-| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                                                        |
-| `dotenv_version`          | No       | `17.4.2`                          | dotenv version                                                                                   |
-| `node_version`            | No       | `24`                              | Node.js version                                                                                  |
-| `target_url`              | Yes      | -                                 | Target URL to run tests against                                                                  |
-| `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit )                              |
-| `shard_total`             | No       | `4`                               | Number of parallel shards                                                                        |
-| `fail_fast`               | No       | `false`                           | Cancel remaining shards when one fails                                                           |
-| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts                                                               |
-| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots                                                                      |
+| Name                      | Required | Default                           | Description                                                                                             |
+| ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `playwright_version`      | No       | `''`                              | Exact Playwright version. Empty reads `@playwright/test` from `package_json_path` (fallback `1.55.1`)   |
+| `package_json_path`       | No       | `package.json`                    | `package.json` to read `@playwright/test` from, relative to the repo root (e.g. `website/package.json`) |
+| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                                                               |
+| `dotenv_version`          | No       | `17.4.2`                          | dotenv version                                                                                          |
+| `node_version`            | No       | `24`                              | Node.js version                                                                                         |
+| `target_url`              | Yes      | -                                 | Target URL to run tests against                                                                         |
+| `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit )                                     |
+| `shard_total`             | No       | `4`                               | Number of parallel shards                                                                               |
+| `fail_fast`               | No       | `false`                           | Cancel remaining shards when one fails                                                                  |
+| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts                                                                      |
+| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots                                                                             |
 
 **Secrets:**
 
@@ -686,7 +688,21 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 | `SLACK_WEBHOOK`        | No       | Slack incoming webhook URL                                                                                                                              |
 | `E2E_EXTRA_ENV`        | No       | Project-specific env vars for the test step, one `KEY=value` per line (see below)                                                                       |
 
-**Playwright version.** By default the workflow installs the exact version of `@playwright/test` from your `package.json` (a range like `^1.56.1` resolves to `1.56.1`), so CI matches local runs. If it can't parse one (missing, `catalog:`, `workspace:`), it falls back to `1.55.1` and logs a warning. Set `playwright_version` to pin a version explicitly. It is installed exactly, not as a `^` range.
+**Playwright version.** Playwright is always installed at an exact version, never a `^` range, so CI runs the same version as local runs. The workflow picks it in this order:
+
+1. `playwright_version`, if set (e.g. `'1.56.1'`).
+2. `@playwright/test` from `package_json_path` (default `package.json`). A range like `^1.56.1` resolves to `1.56.1`.
+3. `1.55.1`, with a warning, if step 2 finds no parseable version (missing, `catalog:`, `workspace:`).
+
+In a monorepo where Playwright is declared in a subfolder, point `package_json_path` at that file. Otherwise the root `package.json` has no `@playwright/test` and you silently get the `1.55.1` fallback:
+
+```yaml
+with:
+  target_url: https://dev.example.com
+  package_json_path: website/package.json
+```
+
+`package_json_path` only changes where the version is read from. Tests still run from the repo root, so `playwright.config.ts` must be discoverable there. The path must be relative and inside the repository. If you set it and the file can't be read, the job fails rather than falling back.
 
 **Project-specific secrets (`E2E_EXTRA_ENV`).** Pass extra variables without changing this workflow. Each line is `KEY=value`; blank lines and `#` comments are skipped, and the value is used verbatim. The variables are exported only in the Playwright step, not to later steps:
 

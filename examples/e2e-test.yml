@@ -31,7 +31,8 @@ jobs:
     with:
       target_url: https://dev.example.com # required -- target URL to run tests against
       ## Optional (uncomment to override defaults)
-      # playwright_version: ''                                # Exact version; empty = @playwright/test from package.json (fallback 1.55.1)
+      # playwright_version: ''                                # Exact version; empty = @playwright/test from package_json_path (fallback 1.55.1)
+      # package_json_path: package.json                       # Where to read @playwright/test from; monorepo e.g. website/package.json
       # axe_core_version: '4.11.0'                            # Axe accessibility testing library version
       # dotenv_version: '17.4.2'                              # dotenv version
       # node_version: '24'                                    # Node.js version
