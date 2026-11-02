@@ -745,6 +745,8 @@ export { expect };
 
 Page-level routes run before context routes. A spec that intercepts a request with `page.route()` must finish with `route.fallback()`, not `route.continue()`, or the request skips the bypass handler.
 
+**Reports can contain secrets.** Playwright traces record request headers, and the HTML report embeds traces. With `trace` enabled, uploaded `playwright-report` artifacts may include bypass headers such as `x-vercel-ci-waf-bypass` or any testing key you pass through `E2E_EXTRA_ENV`. GitHub masks secrets in logs, not inside artifacts. Keep caller repos private, keep `artifact_retention_days` short, or disable traces in CI. Scoping headers to the `BASE_URL` origin also stops them reaching third-party hosts and their logs.
+
 ---
 
 ### promote-branch.yml
