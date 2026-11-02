@@ -1,3 +1,10 @@
+## [2.2.4](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.3...v2.2.4) (2026-11-02)
+
+
+### Bug Fixes
+
+* **ci:** E2E extra env, Playwright resolution, and monorepo package_json_path ([#63](https://github.com/maker-tech/ci-github-actions-shared/issues/63)) ([43b7a7e](https://github.com/maker-tech/ci-github-actions-shared/commit/43b7a7e0fa57fe526487f9719349240ceb124e07))
+
 ## [2.2.3](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.2...v2.2.3) (2026-10-19)
 
 
