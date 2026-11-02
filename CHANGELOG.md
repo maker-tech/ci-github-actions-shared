@@ -1,3 +1,10 @@
+## [2.3.1](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.3.0...v2.3.1) (2026-11-02)
+
+
+### Bug Fixes
+
+* **ci:** fail CI on test and typecheck errors ([#65](https://github.com/maker-tech/ci-github-actions-shared/issues/65)) ([15959f2](https://github.com/maker-tech/ci-github-actions-shared/commit/15959f2b4264eb7765bc47968bd44309179aea25))
+
 ## [2.3.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.4...v2.3.0) (2026-11-02)
 
 
