@@ -15,6 +15,16 @@
 #         BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
 #         VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }}
 #         SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+#         # Optional: project-specific env vars for the test run, one KEY=value per line
+#         E2E_EXTRA_ENV: |
+#           MY_TESTING_BYPASS_KEY=${{ secrets.MY_TESTING_BYPASS_KEY }}
+#
+# Playwright version: leave `playwright_version` empty to use the exact version of
+# @playwright/test in the caller's package.json (falls back to 1.55.1).
+#
+# VERCEL_CI_WAF_BYPASS: do NOT put it in `extraHTTPHeaders`. That sends the header to
+# every host, and third-party APIs (e.g. Contentful) reject it in CORS preflight.
+# Add it with `context.route()` scoped to the BASE_URL origin instead. See the README.
 #
 
 name: E2E Tests
@@ -23,13 +33,17 @@ on:
   workflow_call:
     inputs:
       playwright_version:
-        description: 'Playwright version'
+        description: 'Exact Playwright version. Empty reads @playwright/test from package.json, falling back to 1.55.1.'
         type: string
-        default: '1.55.1'
+        default: ''
       axe_core_version:
         description: 'Axe accessibility testing library version'
         type: string
         default: '4.11.0'
+      dotenv_version:
+        description: 'dotenv version installed alongside Playwright'
+        type: string
+        default: '17.4.2'
       node_version:
         description: 'Node.js version'
         type: string
@@ -71,6 +85,9 @@ on:
       VERCEL_CI_WAF_BYPASS:
         description: 'Value for x-vercel-ci-waf-bypass (Vercel Firewall CI bypass; optional)'
         required: false
+      E2E_EXTRA_ENV:
+        description: 'Extra env vars for the Playwright run, one KEY=value per line (optional). Use for project-specific secrets.'
+        required: false
 
 permissions:
   contents: read
@@ -108,23 +125,74 @@ jobs:
           node-version: ${{ inputs.node_version }}
           package-manager-cache: false # Disable package manager cache to avoid conflicts with pnpm
 
+      - name: Resolve Playwright version
+        id: playwright-version
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.playwright_version }}
+          FALLBACK_VERSION: '1.55.1'
+        run: |
+          # Must run before package.json is swapped out in the install step.
+          node <<'EOF' >> "$GITHUB_OUTPUT"
+          const fs = require('fs');
+          const semver = /[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?/;
+          const fallback = process.env.FALLBACK_VERSION;
+          let version = (process.env.INPUT_VERSION || '').trim();
+          let source = 'playwright_version input';
+
+          if (version) {
+            const match = version.match(semver);
+            if (!match) {
+              console.error(`::error::playwright_version "${version}" is not a valid version`);
+              process.exit(1);
+            }
+            version = match[0];
+          } else {
+            let spec;
+            try {
+              const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+              spec = pkg.devDependencies?.['@playwright/test'] ?? pkg.dependencies?.['@playwright/test'];
+            } catch (err) {
+              console.error(`::warning::Could not read package.json: ${err.message}`);
+            }
+            const match = spec && String(spec).match(semver);
+            if (match) {
+              version = match[0];
+              source = `package.json (${spec})`;
+            } else {
+              version = fallback;
+              source = 'fallback';
+              console.error(`::warning::@playwright/test is missing or unparseable in package.json (${spec ?? 'missing'}); using ${fallback}`);
+            }
+          }
+
+          console.error(`Using Playwright ${version} from ${source}`);
+          process.stdout.write(`version=${version}\n`);
+          EOF
+
       - name: Install minimal Playwright dependencies
         shell: bash
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+          PLAYWRIGHT_VERSION: ${{ steps.playwright-version.outputs.version }}
+          AXE_CORE_VERSION: ${{ inputs.axe_core_version }}
+          DOTENV_VERSION: ${{ inputs.dotenv_version }}
         run: |
           # Replace package.json to avoid installing full project dependencies
           # We only need: @playwright/test, @axe-core/playwright, and dotenv
           mv package.json package.json.original
           echo '{"name":"e2e-tests","version":"1.0.0"}' > package.json
-          npm install @playwright/test@^${{ inputs.playwright_version }} @axe-core/playwright@${{ inputs.axe_core_version }} dotenv
+          npm install \
+            "@playwright/test@${PLAYWRIGHT_VERSION}" \
+            "@axe-core/playwright@${AXE_CORE_VERSION}" \
+            "dotenv@${DOTENV_VERSION}"
 
       - name: Cache Playwright browsers
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ inputs.test_browser }}-${{ inputs.playwright_version }}
+          key: ${{ runner.os }}-playwright-${{ inputs.test_browser }}-${{ steps.playwright-version.outputs.version }}
           restore-keys: |
             ${{ runner.os }}-playwright-${{ inputs.test_browser }}-
 
@@ -140,7 +208,31 @@ jobs:
           BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}
           BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
           VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }}
-        run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ inputs.shard_total }}
+          E2E_EXTRA_ENV: ${{ secrets.E2E_EXTRA_ENV }}
+        run: |
+          # Export E2E_EXTRA_ENV (KEY=value per line) into this step only. It is parsed,
+          # not sourced, and not written to GITHUB_ENV, so later steps never see it.
+          if [[ -n "${E2E_EXTRA_ENV}" ]]; then
+            while IFS= read -r line || [[ -n "$line" ]]; do
+              line="${line%$'\r'}"
+              [[ -z "${line//[[:space:]]/}" || "$line" =~ ^[[:space:]]*# ]] && continue
+              if [[ "$line" != *=* ]]; then
+                echo "::error::E2E_EXTRA_ENV has a line without '=' (expected KEY=value)"
+                exit 1
+              fi
+              key="${line%%=*}"
+              key="${key#"${key%%[![:space:]]*}"}"
+              key="${key%"${key##*[![:space:]]}"}"
+              if [[ ! "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+                echo "::error::E2E_EXTRA_ENV has an invalid variable name: ${key}"
+                exit 1
+              fi
+              export "${key}=${line#*=}"
+              echo "E2E_EXTRA_ENV: exported ${key}"
+            done <<< "${E2E_EXTRA_ENV}"
+            unset E2E_EXTRA_ENV
+          fi
+          npx playwright test --shard=${{ matrix.shardIndex }}/${{ inputs.shard_total }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

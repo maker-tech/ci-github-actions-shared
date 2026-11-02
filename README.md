@@ -203,17 +203,18 @@ Add the required secrets to your repository:
 
 **Settings → Secrets and variables → Actions**
 
-| Secret                    | Required For              | Permissions                                                                                       |
-| ------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------- |
-| `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     | Chromatic project token                                                                           |
-| `CI_GITHUB_TOKEN`         | Branch promotion/releases | Fine-grained PAT with **Contents: Read and write** on the target repository                       |
-| `BASIC_AUTH_USER`         | E2E tests (optional)      | Basic auth username for protected environments                                                    |
-| `BASIC_AUTH_PASSWORD`     | E2E tests (optional)      | Basic auth password for protected environments                                                    |
-| `VERCEL_CI_WAF_BYPASS`    | E2E tests (optional)      | Vercel Firewall CI bypass token (`x-vercel-ci-waf-bypass`; set in Playwright config when present) |
-| `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                                        |
-| `VERCEL_TOKEN`            | Vercel CLI deploys        | Vercel access token scoped to the correct team                                                    |
-| `VERCEL_ORG_ID`           | Vercel CLI deploys        | Vercel org/team ID (`team_xxx`)                                                                   |
-| `VERCEL_PROJECT_ID`       | Vercel CLI deploys        | Vercel project ID (`prj_xxx`)                                                                     |
+| Secret                    | Required For              | Permissions                                                                                   |
+| ------------------------- | ------------------------- | --------------------------------------------------------------------------------------------- |
+| `CHROMATIC_PROJECT_TOKEN` | Chromatic deployments     | Chromatic project token                                                                       |
+| `CI_GITHUB_TOKEN`         | Branch promotion/releases | Fine-grained PAT with **Contents: Read and write** on the target repository                   |
+| `BASIC_AUTH_USER`         | E2E tests (optional)      | Basic auth username for protected environments                                                |
+| `BASIC_AUTH_PASSWORD`     | E2E tests (optional)      | Basic auth password for protected environments                                                |
+| `VERCEL_CI_WAF_BYPASS`    | E2E tests (optional)      | Vercel Firewall CI bypass token (`x-vercel-ci-waf-bypass`; scope it to the `BASE_URL` origin) |
+| `E2E_EXTRA_ENV`           | E2E tests (optional)      | Extra env vars for the Playwright run, one `KEY=value` per line                               |
+| `SLACK_WEBHOOK`           | Slack notifications       | Slack incoming webhook URL                                                                    |
+| `VERCEL_TOKEN`            | Vercel CLI deploys        | Vercel access token scoped to the correct team                                                |
+| `VERCEL_ORG_ID`           | Vercel CLI deploys        | Vercel org/team ID (`team_xxx`)                                                               |
+| `VERCEL_PROJECT_ID`       | Vercel CLI deploys        | Vercel project ID (`prj_xxx`)                                                                 |
 
 ## Common Wrapper Examples
 
@@ -358,8 +359,9 @@ jobs:
     with:
       target_url: https://dev.levande.com.au
       ## Defaults (uncomment to override)
-      # playwright_version: '1.55.1'
+      # playwright_version: ''  # empty = @playwright/test from package.json
       # axe_core_version: '4.11.0'
+      # dotenv_version: '17.4.2'
       # node_version: '24'
       # test_browser: chromium  #options: chromium,firefox,webkit
       # shard_total: 4
@@ -371,6 +373,9 @@ jobs:
       BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }}
       VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }}
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
+      # Optional: project-specific secrets, one KEY=value per line
+      E2E_EXTRA_ENV: |
+        LEVANDE_X_TESTING_API_BYPASS_KEY=${{ secrets.LEVANDE_X_TESTING_API_BYPASS_KEY }}
 ```
 
 ### Branch Promotion
@@ -522,7 +527,7 @@ jobs:
 
    ```json
    {
-   	"ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then exit 0; else exit 1; fi"
+     "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then exit 0; else exit 1; fi"
    }
    ```
 
@@ -658,26 +663,71 @@ Run sharded Playwright E2E tests against a target URL. Uses minimal dependencies
 
 **Inputs:**
 
-| Name                      | Required | Default                           | Description                                                         |
-| ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------- |
-| `playwright_version`      | No       | `1.55.1`                          | Playwright version                                                  |
-| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                           |
-| `node_version`            | No       | `24`                              | Node.js version                                                     |
-| `target_url`              | Yes      | -                                 | Target URL to run tests against                                     |
-| `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit ) |
-| `shard_total`             | No       | `4`                               | Number of parallel shards                                           |
-| `fail_fast`               | No       | `false`                           | Cancel remaining shards when one fails                              |
-| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts                                  |
-| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots                                         |
+| Name                      | Required | Default                           | Description                                                                                      |
+| ------------------------- | -------- | --------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `playwright_version`      | No       | `''`                              | Exact Playwright version. Empty reads `@playwright/test` from `package.json` (fallback `1.55.1`) |
+| `axe_core_version`        | No       | `4.11.0`                          | Axe accessibility testing library version                                                        |
+| `dotenv_version`          | No       | `17.4.2`                          | dotenv version                                                                                   |
+| `node_version`            | No       | `24`                              | Node.js version                                                                                  |
+| `target_url`              | Yes      | -                                 | Target URL to run tests against                                                                  |
+| `test_browser`            | No       | `chromium`                        | Browser to install and test with (options:chromium,firefox,webkit )                              |
+| `shard_total`             | No       | `4`                               | Number of parallel shards                                                                        |
+| `fail_fast`               | No       | `false`                           | Cancel remaining shards when one fails                                                           |
+| `artifact_retention_days` | No       | `30`                              | Days to keep test report artifacts                                                               |
+| `fail_screenshots_path`   | No       | `tests/functional/screenshots/**` | Path to failure screenshots                                                                      |
 
 **Secrets:**
 
-| Name                   | Required | Notes                                                                                                                                        |
-| ---------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BASIC_AUTH_USER`      | No       | Basic auth username for protected environments                                                                                               |
-| `BASIC_AUTH_PASSWORD`  | No       | Basic auth password for protected environments                                                                                               |
-| `VERCEL_CI_WAF_BYPASS` | No       | Vercel Firewall CI bypass; wire `process.env.VERCEL_CI_WAF_BYPASS` to `extraHTTPHeaders['x-vercel-ci-waf-bypass']` in `playwright.config.ts` |
-| `SLACK_WEBHOOK`        | No       | Slack incoming webhook URL                                                                                                                   |
+| Name                   | Required | Notes                                                                                                                                                   |
+| ---------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BASIC_AUTH_USER`      | No       | Basic auth username for protected environments                                                                                                          |
+| `BASIC_AUTH_PASSWORD`  | No       | Basic auth password for protected environments                                                                                                          |
+| `VERCEL_CI_WAF_BYPASS` | No       | Vercel Firewall CI bypass. Exposed as `process.env.VERCEL_CI_WAF_BYPASS`; send it as `x-vercel-ci-waf-bypass` to the `BASE_URL` origin only (see below) |
+| `SLACK_WEBHOOK`        | No       | Slack incoming webhook URL                                                                                                                              |
+| `E2E_EXTRA_ENV`        | No       | Project-specific env vars for the test step, one `KEY=value` per line (see below)                                                                       |
+
+**Playwright version.** By default the workflow installs the exact version of `@playwright/test` from your `package.json` (a range like `^1.56.1` resolves to `1.56.1`), so CI matches local runs. If it can't parse one (missing, `catalog:`, `workspace:`), it falls back to `1.55.1` and logs a warning. Set `playwright_version` to pin a version explicitly. It is installed exactly, not as a `^` range.
+
+**Project-specific secrets (`E2E_EXTRA_ENV`).** Pass extra variables without changing this workflow. Each line is `KEY=value`; blank lines and `#` comments are skipped, and the value is used verbatim. The variables are exported only in the Playwright step, not to later steps:
+
+```yaml
+secrets:
+  E2E_EXTRA_ENV: |
+    LEVANDE_X_TESTING_API_BYPASS_KEY=${{ secrets.LEVANDE_X_TESTING_API_BYPASS_KEY }}
+```
+
+**Vercel WAF bypass: scope the header to your site.** Do not set `x-vercel-ci-waf-bypass` through `extraHTTPHeaders`. That sends it to every host the browser calls, and third-party APIs that don't list it in `Access-Control-Allow-Headers` (Contentful, for example) fail CORS preflight, so client-side data renders empty. Add it with a context route limited to the `BASE_URL` origin, in a shared fixture that every spec imports `test` from:
+
+```ts
+// tests/fixtures/test.ts
+import { test as base, expect } from '@playwright/test';
+
+export const test = base.extend({
+  context: async ({ context, baseURL }, use) => {
+    const secret = process.env.VERCEL_CI_WAF_BYPASS;
+    if (process.env.CI && secret && baseURL) {
+      const origin = new URL(baseURL).origin;
+      await context.route(
+        (url) => url.origin === origin,
+        (route) => {
+          const request = route.request();
+          const postData = request.postDataBuffer();
+          return route.continue({
+            headers: { ...request.headers(), 'x-vercel-ci-waf-bypass': secret },
+            // Forward the body explicitly so POSTs (e.g. form submits) don't hang
+            ...(postData ? { postData } : {})
+          });
+        }
+      );
+    }
+    await use(context);
+  }
+});
+
+export { expect };
+```
+
+Page-level routes run before context routes. A spec that intercepts a request with `page.route()` must finish with `route.fallback()`, not `route.continue()`, or the request skips the bypass handler.
 
 ---
 
@@ -854,11 +904,11 @@ Use the preset in a consuming repository to track shared workflow updates and ap
 
 ```json
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": [
-		"config:recommended",
-		"github>maker-tech/ci-github-actions-shared:renovate-preset"
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "github>maker-tech/ci-github-actions-shared:renovate-preset"
+  ]
 }
 ```
 
@@ -885,21 +935,21 @@ Extend the preset in the consuming repo's `renovate.json` for packages that shou
 
 ```json
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": [
-		"config:recommended",
-		"github>maker-tech/ci-github-actions-shared:renovate-preset"
-	],
-	"packageRules": [
-		{
-			"description": "Project-specific critical packages",
-			"matchPackageNames": ["/^@sentry//", "/^@builder\\.io//"],
-			"labels": ["dependencies", "critical"],
-			"automerge": false,
-			"minimumReleaseAge": "14 days",
-			"prPriority": 15
-		}
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "github>maker-tech/ci-github-actions-shared:renovate-preset"
+  ],
+  "packageRules": [
+    {
+      "description": "Project-specific critical packages",
+      "matchPackageNames": ["/^@sentry//", "/^@builder\\.io//"],
+      "labels": ["dependencies", "critical"],
+      "automerge": false,
+      "minimumReleaseAge": "14 days",
+      "prPriority": 15
+    }
+  ]
 }
 ```
 

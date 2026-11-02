@@ -4,7 +4,9 @@
 # Calls: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml
 #
 # Triggers: push to dev (excluding docs/config changes), manual dispatch
-# Required secrets: none (BASIC_AUTH_*, SLACK_WEBHOOK, VERCEL_CI_WAF_BYPASS are optional)
+# Required secrets: none (BASIC_AUTH_*, SLACK_WEBHOOK, VERCEL_CI_WAF_BYPASS, E2E_EXTRA_ENV are optional)
+# VERCEL_CI_WAF_BYPASS: scope the header to the BASE_URL origin with context.route(),
+# never extraHTTPHeaders (it breaks CORS calls to third-party APIs). See the README.
 # Permissions: contents: read (default)
 
 name: E2E Tests DEV
@@ -29,8 +31,9 @@ jobs:
     with:
       target_url: https://dev.example.com # required -- target URL to run tests against
       ## Optional (uncomment to override defaults)
-      # playwright_version: '1.55.1'                          # Playwright version
+      # playwright_version: ''                                # Exact version; empty = @playwright/test from package.json (fallback 1.55.1)
       # axe_core_version: '4.11.0'                            # Axe accessibility testing library version
+      # dotenv_version: '17.4.2'                              # dotenv version
       # node_version: '24'                                    # Node.js version
       # test_browser: chromium                                # options: chromium, firefox, webkit
       # shard_total: 4                                        # Number of parallel shards
@@ -41,5 +44,7 @@ jobs:
       ## Optional secrets (uncomment if needed)
       # BASIC_AUTH_USER: ${{ secrets.BASIC_AUTH_USER }}         # Basic auth username for protected environments
       # BASIC_AUTH_PASSWORD: ${{ secrets.BASIC_AUTH_PASSWORD }} # Basic auth password for protected environments
-      # VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }} # Vercel Firewall CI bypass (x-vercel-ci-waf-bypass header in playwright.config.ts)
+      # VERCEL_CI_WAF_BYPASS: ${{ secrets.VERCEL_CI_WAF_BYPASS }} # Vercel Firewall CI bypass (x-vercel-ci-waf-bypass, scoped to BASE_URL origin)
       # SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}        # Slack webhook for failure notifications
+      # E2E_EXTRA_ENV: |                                       # Project-specific env vars for the test step, one KEY=value per line
+      #   MY_TESTING_BYPASS_KEY=${{ secrets.MY_TESTING_BYPASS_KEY }}
