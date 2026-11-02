@@ -1,70 +1,70 @@
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"description": "Renovate config for this repo only (GitHub Actions). Automerge is limited to trusted core actions on minor/patch/digest. Do not copy this file into consuming repos; they should extend renovate-preset.json instead.",
-	"extends": ["config:recommended", ":ignoreUnstable"],
-	"timezone": "Pacific/Auckland",
-	"schedule": ["* 0-6 * * 1-5"],
-	"automergeSchedule": ["* 0-7 * * 1-5"],
-	"rebaseWhen": "conflicted",
-	"prConcurrentLimit": 5,
-	"prCreation": "not-pending",
-	"minimumReleaseAge": "14 days",
-	"labels": ["dependencies", "automated"],
-	"commitMessagePrefix": "chore(ci):",
-	"vulnerabilityAlerts": {
-		"enabled": true,
-		"addLabels": ["security"],
-		"minimumReleaseAge": null
-	},
-	"packageRules": [
-		{
-			"description": "Vulnerability alerts - highest priority",
-			"matchCategories": ["security"],
-			"addLabels": ["security"],
-			"minimumReleaseAge": null,
-			"prPriority": 100
-		},
-		{
-			"description": "Major updates require manual review (never automerge)",
-			"matchUpdateTypes": ["major"],
-			"automerge": false
-		},
-		{
-			"description": "Pin GitHub Actions digests for SHA-pinning consistency",
-			"matchManagers": ["github-actions"],
-			"pinDigests": true
-		},
-		{
-			"description": "GitHub Actions - core/trusted actions (auto-merge minor/patch/digest)",
-			"matchManagers": ["github-actions"],
-			"matchPackageNames": [
-				"actions/checkout",
-				"actions/setup-node",
-				"actions/cache",
-				"actions/upload-artifact",
-				"pnpm/action-setup"
-			],
-			"matchUpdateTypes": ["minor", "patch", "digest"],
-			"groupName": "github-actions-core",
-			"addLabels": ["github-actions"],
-			"prPriority": 20,
-			"automerge": true,
-			"automergeType": "pr"
-		},
-		{
-			"description": "GitHub Actions - third-party actions (no auto-merge)",
-			"matchManagers": ["github-actions"],
-			"matchPackageNames": [
-				"!actions/checkout",
-				"!actions/setup-node",
-				"!actions/cache",
-				"!actions/upload-artifact",
-				"!pnpm/action-setup"
-			],
-			"groupName": "github-actions-third-party",
-			"addLabels": ["github-actions"],
-			"prPriority": 15,
-			"automerge": false
-		}
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate config for this repo only (GitHub Actions). Automerge is limited to trusted core actions on minor/patch/digest. Do not copy this file into consuming repos; they should extend renovate-preset.json instead.",
+  "extends": ["config:recommended", ":ignoreUnstable"],
+  "timezone": "Pacific/Auckland",
+  "schedule": ["* 0-6 * * 1-5"],
+  "automergeSchedule": ["* 0-7 * * 1-5"],
+  "rebaseWhen": "conflicted",
+  "prConcurrentLimit": 5,
+  "prCreation": "not-pending",
+  "minimumReleaseAge": "14 days",
+  "labels": ["dependencies", "automated"],
+  "commitMessagePrefix": "chore(ci):",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "addLabels": ["security"],
+    "minimumReleaseAge": null
+  },
+  "packageRules": [
+    {
+      "description": "Vulnerability alerts - highest priority",
+      "matchCategories": ["security"],
+      "addLabels": ["security"],
+      "minimumReleaseAge": null,
+      "prPriority": 100
+    },
+    {
+      "description": "Major updates require manual review (never automerge)",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "Pin GitHub Actions digests for SHA-pinning consistency",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    },
+    {
+      "description": "GitHub Actions - core/trusted actions (auto-merge minor/patch/digest)",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": [
+        "actions/checkout",
+        "actions/setup-node",
+        "actions/cache",
+        "actions/upload-artifact",
+        "pnpm/action-setup"
+      ],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "groupName": "github-actions-core",
+      "addLabels": ["github-actions"],
+      "prPriority": 20,
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "GitHub Actions - third-party actions (no auto-merge)",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": [
+        "!actions/checkout",
+        "!actions/setup-node",
+        "!actions/cache",
+        "!actions/upload-artifact",
+        "!pnpm/action-setup"
+      ],
+      "groupName": "github-actions-third-party",
+      "addLabels": ["github-actions"],
+      "prPriority": 15,
+      "automerge": false
+    }
+  ]
 }

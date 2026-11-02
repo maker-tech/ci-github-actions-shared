@@ -4,11 +4,11 @@ How to obtain the three secrets required for deploying to Vercel via the CLI in 
 
 ## Required Secrets
 
-| Secret             | Description                                  |
-| ------------------ | -------------------------------------------- |
-| `VERCEL_TOKEN`     | Personal access token or team-scoped token   |
-| `VERCEL_ORG_ID`    | Internal team/org ID (format: `team_xxx`)    |
-| `VERCEL_PROJECT_ID`| Internal project ID (format: `prj_xxx`)      |
+| Secret              | Description                                |
+| ------------------- | ------------------------------------------ |
+| `VERCEL_TOKEN`      | Personal access token or team-scoped token |
+| `VERCEL_ORG_ID`     | Internal team/org ID (format: `team_xxx`)  |
+| `VERCEL_PROJECT_ID` | Internal project ID (format: `prj_xxx`)    |
 
 ---
 
@@ -89,9 +89,9 @@ npx vercel ls --scope=<team-slug> --token=<your-token>
 
 If you get **"Project not found"** during deployment, check the following:
 
-| Cause | Fix |
-| --- | --- |
-| Token scoped to personal account, but project is under a team | Recreate the token with the correct **team scope** |
-| `VERCEL_ORG_ID` is your personal ID, but project is under a team (or vice versa) | Re-run `vercel link` and copy the correct `orgId` |
-| Trailing whitespace or newline in a GitHub secret | Delete and re-add the secret, pasting cleanly |
-| Token has access to multiple teams | Add `--scope` to the Vercel CLI command in your workflow: `npx vercel --prod --scope=${{ secrets.VERCEL_ORG_ID }} --token=${{ secrets.VERCEL_TOKEN }}` |
+| Cause                                                                            | Fix                                                                                                                                                    |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Token scoped to personal account, but project is under a team                    | Recreate the token with the correct **team scope**                                                                                                     |
+| `VERCEL_ORG_ID` is your personal ID, but project is under a team (or vice versa) | Re-run `vercel link` and copy the correct `orgId`                                                                                                      |
+| Trailing whitespace or newline in a GitHub secret                                | Delete and re-add the secret, pasting cleanly                                                                                                          |
+| Token has access to multiple teams                                               | Add `--scope` to the Vercel CLI command in your workflow: `npx vercel --prod --scope=${{ secrets.VERCEL_ORG_ID }} --token=${{ secrets.VERCEL_TOKEN }}` |

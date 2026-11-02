@@ -8,11 +8,15 @@ Commits must follow [Conventional Commits](https://www.conventionalcommits.org/)
 
 With the default conventionalcommits tooling, these **types drive semver bumps**:
 
-| Prefix | Typical bump | Notes |
-|--------|--------------|--------|
-| `feat:` | **minor** | New backward-compatible behavior |
-| `fix:` | **patch** | Bug fixes |
-| `perf:` | **patch** | Performance improvements |
+| Prefix  | Typical bump | Notes                            |
+| ------- | ------------ | -------------------------------- |
+| `feat:` | **minor**    | New backward-compatible behavior |
+| `fix:`  | **patch**    | Bug fixes                        |
+| `perf:` | **patch**    | Performance improvements         |
+
+A new workflow input, secret or output, or a change to a default, is `feat`, not `fix`.
+
+When squash-merging, the PR title becomes the commit message and decides the bump. Make sure its type matches the most significant change in the PR.
 
 A **major** bump usually requires a breaking change: `type!:` (e.g. `feat!: remove old API`) or a footer such as `BREAKING CHANGE:` in the commit body.
 
@@ -20,7 +24,7 @@ A **major** bump usually requires a breaking change: `type!:` (e.g. `feat!: remo
 
 Examples: `chore:`, `ci:`, `docs:`, `style:`, `refactor:`, `test:`, `build:`.
 
-They may still be listed in generated notes, but **they do not trigger a new version** on their own. For CI/workflow changes that *should* ship as a patch release, use something like **`fix(ci): …`** so consumers get a tag to pin—not `chore(ci):`.
+They may still be listed in generated notes, but **they do not trigger a new version** on their own. For CI/workflow changes that _should_ ship as a patch release, use something like **`fix(ci): …`** so consumers get a tag to pin—not `chore(ci):`.
 
 ## Scopes
 
