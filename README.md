@@ -357,7 +357,7 @@ jobs:
     name: 'E2E Tests'
     uses: maker-tech/ci-github-actions-shared/.github/workflows/e2e-test.yml@v2
     with:
-      target_url: https://dev.levande.com.au
+      target_url: https://dev.example.com
       ## Defaults (uncomment to override)
       # playwright_version: ''  # empty = @playwright/test from package_json_path
       # package_json_path: package.json  # monorepo: e.g. website/package.json
@@ -376,7 +376,7 @@ jobs:
       SLACK_WEBHOOK: ${{ secrets.SLACK_APP_WEBHOOK }}
       # Optional: project-specific secrets, one KEY=value per line
       E2E_EXTRA_ENV: |
-        LEVANDE_X_TESTING_API_BYPASS_KEY=${{ secrets.LEVANDE_X_TESTING_API_BYPASS_KEY }}
+        MY_TESTING_BYPASS_KEY=${{ secrets.MY_TESTING_BYPASS_KEY }}
 ```
 
 ### Branch Promotion
@@ -709,10 +709,10 @@ with:
 ```yaml
 secrets:
   E2E_EXTRA_ENV: |
-    LEVANDE_X_TESTING_API_BYPASS_KEY=${{ secrets.LEVANDE_X_TESTING_API_BYPASS_KEY }}
+    MY_TESTING_BYPASS_KEY=${{ secrets.MY_TESTING_BYPASS_KEY }}
 ```
 
-**Vercel WAF bypass: scope the header to your site.** Do not set `x-vercel-ci-waf-bypass` through `extraHTTPHeaders`. That sends it to every host the browser calls, and third-party APIs that don't list it in `Access-Control-Allow-Headers` (Contentful, for example) fail CORS preflight, so client-side data renders empty. Add it with a context route limited to the `BASE_URL` origin, in a shared fixture that every spec imports `test` from:
+**Vercel WAF bypass: scope the header to your site.** Do not set `x-vercel-ci-waf-bypass` through `extraHTTPHeaders`. That sends it to every host the browser calls, and third-party APIs that don't list it in `Access-Control-Allow-Headers` (a headless CMS or analytics API, for example) fail CORS preflight, so client-side data renders empty. Add it with a context route limited to the `BASE_URL` origin, in a shared fixture that every spec imports `test` from:
 
 ```ts
 // tests/fixtures/test.ts
