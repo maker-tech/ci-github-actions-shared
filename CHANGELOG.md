@@ -1,3 +1,10 @@
+## [2.3.0](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.4...v2.3.0) (2026-11-02)
+
+
+### Features
+
+* **ci:** apply Prettier repo-wide and document feat vs fix for workflow changes ([#64](https://github.com/maker-tech/ci-github-actions-shared/issues/64)) ([cd302b2](https://github.com/maker-tech/ci-github-actions-shared/commit/cd302b2d79282e50993b40b30e4a0b31afb164d2)), closes [#63](https://github.com/maker-tech/ci-github-actions-shared/issues/63)
+
 ## [2.2.4](https://github.com/maker-tech/ci-github-actions-shared/compare/v2.2.3...v2.2.4) (2026-11-02)
 
 
