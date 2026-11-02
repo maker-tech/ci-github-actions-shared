@@ -238,36 +238,36 @@ This shared-workflows repo's [`.github/renovate.json`](../.github/renovate.json)
 
 ```json
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"extends": [
-		"config:recommended",
-		"github>maker-tech/ci-github-actions-shared:renovate-preset"
-	],
-	"platformAutomerge": false,
-	"packageRules": [
-		{
-			"description": "Automerge patch and minor updates",
-			"matchUpdateTypes": ["minor", "patch"],
-			"automerge": true,
-			"automergeType": "pr"
-		},
-		{
-			"description": "Shared CI workflows stay on manual review",
-			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
-			"automerge": false
-		},
-		{
-			"description": "Sensitive packages stay on manual review",
-			"matchPackageNames": [
-				"next",
-				"react",
-				"react-dom",
-				"next-auth",
-				"/^@builder\\.io//"
-			],
-			"automerge": false
-		}
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "github>maker-tech/ci-github-actions-shared:renovate-preset"
+  ],
+  "platformAutomerge": false,
+  "packageRules": [
+    {
+      "description": "Automerge patch and minor updates",
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "description": "Shared CI workflows stay on manual review",
+      "matchDepNames": ["maker-tech/ci-github-actions-shared"],
+      "automerge": false
+    },
+    {
+      "description": "Sensitive packages stay on manual review",
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom",
+        "next-auth",
+        "/^@builder\\.io//"
+      ],
+      "automerge": false
+    }
+  ]
 }
 ```
 

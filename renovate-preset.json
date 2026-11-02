@@ -1,99 +1,99 @@
 {
-	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
-	"description": "Shareable Renovate preset for maker-tech repositories. Does not enable automerge (opens PRs only). Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared:renovate-preset\"]",
-	"extends": ["config:recommended", ":ignoreUnstable"],
-	"timezone": "Pacific/Auckland",
-	"schedule": ["* 0-6 * * 1-5"],
-	"automergeSchedule": ["* 0-7 * * 1-5"],
-	"gitIgnoredAuthors": ["cursoragent@cursor.com"],
-	"prCreation": "not-pending",
-	"prConcurrentLimit": 5,
-	"minimumReleaseAge": "14 days",
-	"rebaseWhen": "conflicted",
-	"labels": ["dependencies", "automated"],
-	"vulnerabilityAlerts": {
-		"enabled": true,
-		"addLabels": ["security"],
-		"minimumReleaseAge": null
-	},
-	"customManagers": [
-		{
-			"customType": "regex",
-			"description": "Track maker-tech/ci-github-actions-shared workflow and action references",
-			"fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
-			"matchStrings": [
-				"uses:\\s*['\"]?maker-tech/ci-github-actions-shared/(?:\\.github/workflows|actions)/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
-			],
-			"datasourceTemplate": "github-releases",
-			"depNameTemplate": "maker-tech/ci-github-actions-shared",
-			"versioningTemplate": "semver"
-		}
-	],
-	"packageRules": [
-		{
-			"description": "Vulnerability alerts - highest priority",
-			"matchCategories": ["security"],
-			"addLabels": ["security"],
-			"minimumReleaseAge": null,
-			"prPriority": 100
-		},
-		{
-			"description": "Major updates require manual review (never automerge)",
-			"matchUpdateTypes": ["major"],
-			"automerge": false
-		},
-		{
-			"description": "Pin GitHub Actions digests for SHA-pinning consistency",
-			"matchManagers": ["github-actions"],
-			"pinDigests": true
-		},
-		{
-			"description": "Shared CI workflows - minor/patch updates",
-			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
-			"matchUpdateTypes": ["minor", "patch"],
-			"groupName": "shared-ci-workflows",
-			"addLabels": ["ci-inheritance"],
-			"commitMessagePrefix": "chore(ci):",
-			"minimumReleaseAge": "3 days",
-			"prPriority": 25,
-			"prBodyNotes": [
-				"Updates inherited CI workflows from `ci-github-actions-shared`.",
-				"",
-				"**Review checklist:**",
-				"- [ ] Check [CHANGELOG](https://github.com/maker-tech/ci-github-actions-shared/blob/main/CHANGELOG.md)",
-				"- [ ] Verify workflow inputs haven't changed",
-				"",
-				"**Inheritance strategy**: Inherit, don't scaffold."
-			]
-		},
-		{
-			"description": "Shared CI workflows - major version updates (breaking, never automerge)",
-			"matchDepNames": ["maker-tech/ci-github-actions-shared"],
-			"matchUpdateTypes": ["major"],
-			"automerge": false,
-			"addLabels": ["ci-inheritance", "breaking-change"],
-			"commitMessagePrefix": "chore(ci):",
-			"minimumReleaseAge": "7 days",
-			"prPriority": 30,
-			"prBodyNotes": [
-				"**BREAKING CHANGE**: Major version update to shared CI workflows.",
-				"",
-				"**Before merging:**",
-				"1. Review migration guide in CHANGELOG.md",
-				"2. Check if workflow inputs have changed",
-				"3. Verify secrets requirements haven't changed"
-			]
-		},
-		{
-			"description": "Node.js version - coordinate with shared workflow defaults",
-			"matchManagers": ["nvm", "nodenv"],
-			"matchPackageNames": ["node"],
-			"addLabels": ["nodejs"],
-			"prPriority": 18,
-			"prBodyNotes": [
-				"Ensure Node.js version aligns with `ci-github-actions-shared` defaults.",
-				"Check current default in [setup-node action](https://github.com/maker-tech/ci-github-actions-shared/blob/main/actions/setup-node/action.yml)."
-			]
-		}
-	]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Shareable Renovate preset for maker-tech repositories. Does not enable automerge (opens PRs only). Extend with: \"extends\": [\"github>maker-tech/ci-github-actions-shared:renovate-preset\"]",
+  "extends": ["config:recommended", ":ignoreUnstable"],
+  "timezone": "Pacific/Auckland",
+  "schedule": ["* 0-6 * * 1-5"],
+  "automergeSchedule": ["* 0-7 * * 1-5"],
+  "gitIgnoredAuthors": ["cursoragent@cursor.com"],
+  "prCreation": "not-pending",
+  "prConcurrentLimit": 5,
+  "minimumReleaseAge": "14 days",
+  "rebaseWhen": "conflicted",
+  "labels": ["dependencies", "automated"],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "addLabels": ["security"],
+    "minimumReleaseAge": null
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track maker-tech/ci-github-actions-shared workflow and action references",
+      "fileMatch": ["^\\.github/workflows/.*\\.ya?ml$"],
+      "matchStrings": [
+        "uses:\\s*['\"]?maker-tech/ci-github-actions-shared/(?:\\.github/workflows|actions)/[^@]+@(?<currentValue>[^\\s'\"]+)['\"]?"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "maker-tech/ci-github-actions-shared",
+      "versioningTemplate": "semver"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Vulnerability alerts - highest priority",
+      "matchCategories": ["security"],
+      "addLabels": ["security"],
+      "minimumReleaseAge": null,
+      "prPriority": 100
+    },
+    {
+      "description": "Major updates require manual review (never automerge)",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
+      "description": "Pin GitHub Actions digests for SHA-pinning consistency",
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    },
+    {
+      "description": "Shared CI workflows - minor/patch updates",
+      "matchDepNames": ["maker-tech/ci-github-actions-shared"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "shared-ci-workflows",
+      "addLabels": ["ci-inheritance"],
+      "commitMessagePrefix": "chore(ci):",
+      "minimumReleaseAge": "3 days",
+      "prPriority": 25,
+      "prBodyNotes": [
+        "Updates inherited CI workflows from `ci-github-actions-shared`.",
+        "",
+        "**Review checklist:**",
+        "- [ ] Check [CHANGELOG](https://github.com/maker-tech/ci-github-actions-shared/blob/main/CHANGELOG.md)",
+        "- [ ] Verify workflow inputs haven't changed",
+        "",
+        "**Inheritance strategy**: Inherit, don't scaffold."
+      ]
+    },
+    {
+      "description": "Shared CI workflows - major version updates (breaking, never automerge)",
+      "matchDepNames": ["maker-tech/ci-github-actions-shared"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "addLabels": ["ci-inheritance", "breaking-change"],
+      "commitMessagePrefix": "chore(ci):",
+      "minimumReleaseAge": "7 days",
+      "prPriority": 30,
+      "prBodyNotes": [
+        "**BREAKING CHANGE**: Major version update to shared CI workflows.",
+        "",
+        "**Before merging:**",
+        "1. Review migration guide in CHANGELOG.md",
+        "2. Check if workflow inputs have changed",
+        "3. Verify secrets requirements haven't changed"
+      ]
+    },
+    {
+      "description": "Node.js version - coordinate with shared workflow defaults",
+      "matchManagers": ["nvm", "nodenv"],
+      "matchPackageNames": ["node"],
+      "addLabels": ["nodejs"],
+      "prPriority": 18,
+      "prBodyNotes": [
+        "Ensure Node.js version aligns with `ci-github-actions-shared` defaults.",
+        "Check current default in [setup-node action](https://github.com/maker-tech/ci-github-actions-shared/blob/main/actions/setup-node/action.yml)."
+      ]
+    }
+  ]
 }
