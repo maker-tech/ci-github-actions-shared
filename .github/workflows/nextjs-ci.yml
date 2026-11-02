@@ -106,22 +106,38 @@ jobs:
         if: inputs.run_typecheck
         shell: bash
         working-directory: ${{ steps.resolve-wd.outputs.path }}
+        env:
+          PACKAGE_MANAGER: ${{ inputs.package_manager }}
+        # Choose the script by name, then run it with no fallback, so a type error fails the step.
         run: |
           set -euo pipefail
-          if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
-            pnpm type-check || pnpm typecheck || echo "No type-check script found"
+          has_script() { node -e "process.exit(require('./package.json').scripts?.[process.argv[1]] ? 0 : 1)" "$1"; }
+          if has_script type-check; then
+            script="type-check"
+          elif has_script typecheck; then
+            script="typecheck"
           else
-            npm run typecheck || npm run type-check || echo "No typecheck script found"
+            echo "::notice::No type-check or typecheck script in package.json, skipping"
+            exit 0
           fi
+          if [[ "$PACKAGE_MANAGER" == "pnpm" ]]; then pnpm run "$script"; else npm run "$script"; fi
 
       - name: Test
         if: inputs.run_tests
         shell: bash
         working-directory: ${{ steps.resolve-wd.outputs.path }}
+        env:
+          PACKAGE_MANAGER: ${{ inputs.package_manager }}
+        # Choose the script by name, then run it with no fallback, so a failing test fails the step.
         run: |
           set -euo pipefail
-          if [[ "${{ inputs.package_manager }}" == "pnpm" ]]; then
-            pnpm test || pnpm test:ci || echo "No test script found"
+          has_script() { node -e "process.exit(require('./package.json').scripts?.[process.argv[1]] ? 0 : 1)" "$1"; }
+          if has_script test; then
+            script="test"
+          elif has_script test:ci; then
+            script="test:ci"
           else
-            npm test || npm run test:ci || echo "No test script found"
+            echo "::notice::No test or test:ci script in package.json, skipping"
+            exit 0
           fi
+          if [[ "$PACKAGE_MANAGER" == "pnpm" ]]; then pnpm run "$script"; else npm run "$script"; fi
